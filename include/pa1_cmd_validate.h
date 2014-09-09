@@ -4,12 +4,6 @@
 * Constants and functions related to command line argument validation
 */
 
-typedef enum
-{
-	kSuccess,
-	kNotEnoughArguments,
-	kUnknownMode,
-	kInvalidPort
-} CMD_Validation_Error;
+#include "global.h"
 
-CMD_Validation_Error cmd_arg_validate (int argc, char **argv);
+CMD_Validation_Status cmd_arg_validate (int argc, char **argv);

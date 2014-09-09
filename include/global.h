@@ -5,4 +5,18 @@
 
 #define MAX_PARALLEL_DOWNLOAD 3
 
+typedef enum
+{
+	kSuccess,
+	kNotEnoughArguments,
+	kUnknownMode,
+	kInvalidPort
+} CMD_Validation_Status;
+
+typedef enum{
+	kSERVER_MODE,
+	kCLIENT_MODE
+} RUNNING_MODE;
+
+
 #endif

@@ -13,7 +13,7 @@
 #include <string.h>
 
 
-CMD_Validation_Error cmd_arg_validate (int argc, char **argv){
+CMD_Validation_Status cmd_arg_validate (int argc, char **argv){
 
 	/******* Check if there are enough arguments *********/
 	if (argc != 3) {
@@ -28,6 +28,10 @@ CMD_Validation_Error cmd_arg_validate (int argc, char **argv){
 		fprintf(stderr, "Unknown mode. User either option -c or -s\n");
 		return kUnknownMode;
 	}
+
+
+
+
 
 	/******* Check for valid port number *********/
 	{
@@ -57,4 +61,9 @@ CMD_Validation_Error cmd_arg_validate (int argc, char **argv){
 		}	
 	
 	return kSuccess;
+}
+
+
+int getMode(){
+	
 }

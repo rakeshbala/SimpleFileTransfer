@@ -8,7 +8,7 @@ OBJ_PATH  = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJ_FILES))
 
 LIBS	= 
 CC		= gcc
-CFLAGS	= -I$(INC_DIR) -lncurses
+CFLAGS	= -I$(INC_DIR) -lncurses -lreadline
 
 all: assignment1
 

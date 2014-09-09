@@ -36,18 +36,31 @@
 	 * @param  argv The argument list
 	 * @return 0 EXIT_SUCCESS
 	 */
+
+	 
+
 	 int main(int argc, char **argv)
 	 {
 
 		/**** From Beej's network programming guide *********/
 
 	 	//Check for command line arguments and validate
-	 	CMD_Validation_Error status = cmd_arg_validate(argc,argv);
+	 	CMD_Validation_Status status = cmd_arg_validate(argc,argv);
 	 	if(status != kSuccess){
 	 		return -1;
 	 	}
 
-	 	setupWindow(1);
-	 	tearDown();
+	 	RUNNING_MODE runningMode;
+	 	if (strcmp(argv[1],"-c")==0||strcmp(argv[1],"-C")==0)
+	 	{
+	 		runningMode = kCLIENT_MODE;
+	 	}else{
+	 		runningMode = kSERVER_MODE;
+	 	}
+
+	 	setupWindow(runningMode);
+	 	// tearDown();
 		return 0;
 	}
+
+
