@@ -39,6 +39,9 @@ void commandDispatch(int commandIndex){
 		case 0: {
 			printw("Name	  : Rakesh Balasubramanian\nUBIT Name : rbalasub\n\
 E-mail	  : rbalasub@buffalo.edu\n");
+			printw("I have read and understood the course academic integrity \
+policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f14/\
+index.html#integrity\n"); 
 			break;
 		}
 	}
