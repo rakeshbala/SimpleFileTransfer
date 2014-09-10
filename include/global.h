@@ -2,7 +2,6 @@
 #define GLOBAL_H_
 
 #define HOSTNAME_LEN 128
-
 #define MAX_PARALLEL_DOWNLOAD 3
 
 typedef enum
@@ -18,5 +17,6 @@ typedef enum{
 	kCLIENT_MODE
 } RUNNING_MODE;
 
+extern const char *gbl_commandArray[];
 
 #endif

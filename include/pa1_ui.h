@@ -8,6 +8,5 @@ September 8th, 2014
 #define PA1_UI_H 
 
 void setupWindow(RUNNING_MODE runningMode);
-void exitOrHoldCursor();
 
 #endif
