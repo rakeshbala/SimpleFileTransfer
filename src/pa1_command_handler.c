@@ -34,5 +34,13 @@ bool checkIfCommand(char commandString[200],int *index){
 
 
 void commandDispatch(int commandIndex){
-	printw("Handling comand %s\n",gbl_commandArray[commandIndex]);
+	switch (commandIndex){
+		/******* Handle Creator *********/
+		case 0: {
+			printw("Name	  : Rakesh Balasubramanian\nUBIT Name : rbalasub\n\
+E-mail	  : rbalasub@buffalo.edu\n");
+			break;
+		}
+	}
+
 }
