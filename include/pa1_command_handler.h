@@ -12,6 +12,6 @@ September 9th, 2014
 
 
 bool checkIfCommand(char commandString[200],int *commandIndex);
-void commandDispatch(int commandIndex);
+void commandDispatch(int commandIndex, RUNNING_MODE runningMode);
 
 #endif

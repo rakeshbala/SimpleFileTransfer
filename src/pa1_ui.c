@@ -97,7 +97,7 @@ void exitOrHoldCursor(RUNNING_MODE runningMode){
 		if (isCommand)
 		{
 			/******* Command found. Now dispatch it. *********/
-			commandDispatch(commandIndex);
+			commandDispatch(commandIndex,runningMode);
 
 		}else if(strlen(commandString)>1){
 			/******* Unknown command if more than 1 word *********/
