@@ -201,34 +201,19 @@ void commandMyip(){
 		int ip_family = ifa->ifa_addr->sa_family;
 		void * addr;
 		char * ipVersion;
-		if (ip_family == AF_INET)
+		if ((ip_family == AF_INET) && !(strcmp(ifa->ifa_name,"lo")==0))
 		{	
 			struct sockaddr_in *ipv4 =  (struct sockaddr_in*)ifa->ifa_addr;
 			addr = &(ipv4->sin_addr);
-			ipVersion = "IPv4";
-			printf("%d\n", ntohl(ipv4->sin_port));
-			
-		}else if(ip_family == AF_INET6){
-			struct sockaddr_in6 *ipv6 =  (struct sockaddr_in6*)ifa->ifa_addr;
-			addr = &(ipv6->sin6_addr);
-			ipVersion = "IPv6";
-			printf("%d\n", ntohl(ipv6->sin6_port));
-
-		}else{
-			continue;
+			char ipstr[INET6_ADDRSTRLEN];
+			inet_ntop(ip_family,addr,ipstr,sizeof ipstr);
+			printf("IP address:%s", ipstr);
+			printf("\n");
+			break;	
 		}
 
-		/******* Testing  *********/
-		printf("%-8s %s (%d)\n",
-                      ifa->ifa_name,
-                      (ip_family == AF_PACKET) ? "AF_PACKET" :
-                      (ip_family == AF_INET) ? "AF_INET" :
-                      (ip_family == AF_INET6) ? "AF_INET6" : "???",
-                      ip_family);
 
-		char ipstr[INET6_ADDRSTRLEN];
-		inet_ntop(ip_family,addr,ipstr,sizeof ipstr);
-		printf("IpVersion : %s  Address: %s\n", ipVersion,ipstr );
+
 
 	}
 	freeifaddrs(ifaddr);
