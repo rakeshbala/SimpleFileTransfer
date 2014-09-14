@@ -15,6 +15,5 @@ void toUpperStr(char * str,char *upperStr){
 	// 	temupperStrStr[i]=toUpper(str[i]);
 	// }
 	// upperStr[count+1]='\0';
-
 	
 }

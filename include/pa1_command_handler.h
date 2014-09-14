@@ -10,8 +10,8 @@ September 9th, 2014
 #ifndef PA1_COMMAND_HANDLER_H
 #define PA1_COMMAND_HANDLER_H
 
-
-bool checkIfCommand(char commandString[200],int *commandIndex);
-void commandDispatch(int commandIndex, RUNNING_MODE runningMode);
+void processCommandArray (int argc, char **argv, RUNNING_MODE runningMode);
+bool checkIfCommand(char *commandString,int *commandIndex);
+void commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runningMode);
 
 #endif

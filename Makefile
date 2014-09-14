@@ -8,12 +8,12 @@ OBJ_PATH  = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJ_FILES))
 
 LIBS	= 
 CC		= gcc
-CFLAGS	= -I$(INC_DIR) -lncurses 
+CFLAGS	= -I$(INC_DIR)
 
 all: assignment1
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -g -o $@ $< $(CFLAGS)
 
 assignment1: $(OBJ_PATH)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)

@@ -18,16 +18,16 @@
 	 *
 	 * @section DESCRIPTION
 	 *
-	 * This contains the main function. Add further description here....
+	 * This contains the main function and other setup function calls. 
 	 */
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include <ncurses.h>
 	#include <string.h>
-	#include "pa1_ui.h"
-	 #include "pa1_cmd_validate.h"
 
 	#include "../include/global.h"
+	#include "pa1_ui.h"
+	#include "pa1_cmd_validate.h"
+
 
 	/**
 	 * main function
@@ -42,8 +42,6 @@
 	 int main(int argc, char **argv)
 	 {
 
-		/**** From Beej's network programming guide *********/
-
 	 	//Check for command line arguments and validate
 	 	CMD_Validation_Status status = cmd_arg_validate(argc,argv);
 	 	if(status != kSuccess){
@@ -51,14 +49,14 @@
 	 	}
 
 	 	RUNNING_MODE runningMode;
-	 	if (strcmp(argv[1],"-c")==0||strcmp(argv[1],"-C")==0)
+	 	if (strcmp(argv[1],"c")==0||strcmp(argv[1],"C")==0)
 	 	{
 	 		runningMode = kCLIENT_MODE;
 	 	}else{
 	 		runningMode = kSERVER_MODE;
 	 	}
 
-	 	setupWindow(runningMode);
+	 	startApp(runningMode);
 	 	// tearDown();
 		return 0;
 	}
