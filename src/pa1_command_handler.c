@@ -13,10 +13,10 @@ September 9th, 2014
 #include <strings.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-// #include <sys/socket.h>
-// #include <arpa/inet.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
-// #include <netdb.h>
+#include <netdb.h>
 
 /******* Global constants *********/
 const char *gbl_commandArray[]={"CREATOR\0","HELP\0",
@@ -180,8 +180,6 @@ void commandMyip(){
 
 	/*************************************************
 	Taken from :
-	http://man7.org/linux/man-pages/man3/getifaddrs.3.html
-	and 
 	http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
 	*************************************************/
 	/******* Inner structure *********/
@@ -208,23 +206,32 @@ void commandMyip(){
 			struct sockaddr_in *ipv4 =  (struct sockaddr_in*)ifa->ifa_addr;
 			addr = &(ipv4->sin_addr);
 			ipVersion = "IPv4";
-			printf("%d\n", (ipv4->sin_port));
+			printf("%d\n", ntohl(ipv4->sin_port));
 			
 		}else if(ip_family == AF_INET6){
 			struct sockaddr_in6 *ipv6 =  (struct sockaddr_in6*)ifa->ifa_addr;
 			addr = &(ipv6->sin6_addr);
 			ipVersion = "IPv6";
-			printf("%d\n", (ipv6->sin6_port));
+			printf("%d\n", ntohl(ipv6->sin6_port));
 
 		}else{
 			continue;
 		}
 
+		/******* Testing  *********/
+		printf("%-8s %s (%d)\n",
+                      ifa->ifa_name,
+                      (ip_family == AF_PACKET) ? "AF_PACKET" :
+                      (ip_family == AF_INET) ? "AF_INET" :
+                      (ip_family == AF_INET6) ? "AF_INET6" : "???",
+                      ip_family);
+
 		char ipstr[INET6_ADDRSTRLEN];
 		inet_ntop(ip_family,addr,ipstr,sizeof ipstr);
-		printf("pVersion : %s  Address: %s\n", ipVersion,ipstr );
+		printf("IpVersion : %s  Address: %s\n", ipVersion,ipstr );
 
 	}
+	freeifaddrs(ifaddr);
 }
 
 void commandMyport(){
