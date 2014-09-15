@@ -23,10 +23,15 @@ const char *gbl_commandArray[]={"CREATOR\0","HELP\0",
 "MYIP\0","MYPORT\0","REGISTER\0","CONNECT\0","LIST\0",
 "TERMINATE\0","EXIT\0","UPLOAD\0","DOWNLOAD\0","STATISTICS\0","CLEAR\0"};
 
+int listening_port;
+
 /******* Macros *********/
 
 
 /******* Function declarations *********/
+bool checkIfCommand(char *commandString,int *commandIndex);
+int commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runningMode);
+
 void commandHelp(RUNNING_MODE runningMode, char *command);
 void commandMyip();
 void commandMyport();
@@ -34,20 +39,20 @@ void commandMyport();
 
 
 
-void processCommandArray(int argc, char **argv, RUNNING_MODE runningMode){
+int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode){
 
 	/******* Check if valid command and get command index *********/
 	int commandIndex;
 	if(checkIfCommand(argv[0],&commandIndex)){
 
 	}else{
-		fprintf(stderr, "Unknown command: %s\n", argv[0]);
-		return;
+		fprintf(stderr, "Unknown command: %s", argv[0]);
+		return 1;
 	}
 
 
 	/******* Dispatch commands to their functions *********/
-	commandDispatch(argc,argv,commandIndex,runningMode);
+	return commandDispatch(argc,argv,commandIndex,runningMode);
 
 
 }
@@ -70,14 +75,14 @@ bool checkIfCommand(char *commandString,int *index){
 }
 
 
-void commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runningMode){
+int commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runningMode){
 	switch (commandIndex){
 		/******* Handle CREATOR *********/
 		case 0: {
 			if (argc>1)
 			{
-				fprintf(stderr, "Too many arguments.\n");
-				return;
+				fprintf(stderr, "Too many arguments");
+				break;
 			}
 			printf("\nName	  : Rakesh Balasubramanian\nUBIT Name : rbalasub\n\
 E-mail	  : rbalasub@buffalo.edu\n");
@@ -91,8 +96,8 @@ index.html#integrity\n\n");
 			char *command = "FalseString";
 			if (argc>2)
 			{
-				fprintf(stderr, "Too many arguments\n");
-				return;
+				fprintf(stderr, "Too many arguments");
+				break;
 			}else if(argc==2){
 				command = argv[1];
 			}
@@ -101,19 +106,59 @@ index.html#integrity\n\n");
 		}
 		/******* dispatch MYIP  *********/
 		case 2:{
+			if (argc>1)
+			{
+				fprintf(stderr, "Too many arguments");
+				break;
+			}
 			commandMyip();
 			break;
 		}
-		/******* dispatch MYPORT *********/
+		/******* Handle MYPORT *********/
 		case 3:{
-			commandMyport();
+			if (argc>1)
+			{
+				fprintf(stderr, "Too many arguments");
+				break;
+			}
+			printf("Port number:%d", listening_port);
+			break;
 		}
+
+		/******* Handle REGISTER *********/
+		case 4:{
+			if (runningMode == kSERVER_MODE)
+			{
+				fprintf(stderr, "Command available only in client\n");
+				break;
+			}else if(argc!=3){
+				fprintf(stderr, "Wrong usage\n Usage: REGISTER <SERVER> <PORT>");
+				break;
+			}
+
+			commandRegister(argv[1],argv[2]);
+			break;
+		}
+
+
+		/******* Handle EXIT *********/
+		case 8:{
+			if (argc>1)
+			{
+				fprintf(stderr, "Too many arguments");
+				break;
+			}
+			return -1;
+		}
+
 		/******* Handle CLEAR *********/
 		case 12:{
-					printf("\033[2J\033[1;1H");
-						break;
+			printf("\033[2J\033[1;1H");
+				break;
 		}
 	}
+
+	return 1;
 
 }
 
@@ -173,21 +218,15 @@ STINATION> <PORT NO>",
 			}
 			printf ("%s\n",clientPrintArray[i]);
 		}
-	printf("\n");
 }
 
 void commandMyip(){
 
-	/*************************************************
-	Taken from :
-	http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
-	*************************************************/
-	/******* Inner structure *********/
+
+	/******* ifaddr Inner structure *********/
 	// struct ifaddrs  *ifa_next;     Next item in list 
     // char            *ifa_name;    /* Name of interface */
-	// unsigned int     ifa_flags;    Flags from SIOCGIFFLAGS 
     // struct sockaddr *ifa_addr;    /* Address of interface */
-    // struct sockaddr *ifa_netmask; /* Netmask of interface */
 
 	struct ifaddrs *ifaddr,*ifa;
 
@@ -203,23 +242,17 @@ void commandMyip(){
 		char * ipVersion;
 		if ((ip_family == AF_INET) && !(strcmp(ifa->ifa_name,"lo")==0))
 		{	
+			/******* Break after first IPv4 address encountered 
+			which is not the loop back address *********/
 			struct sockaddr_in *ipv4 =  (struct sockaddr_in*)ifa->ifa_addr;
 			addr = &(ipv4->sin_addr);
 			char ipstr[INET6_ADDRSTRLEN];
 			inet_ntop(ip_family,addr,ipstr,sizeof ipstr);
 			printf("IP address:%s", ipstr);
-			printf("\n");
 			break;	
 		}
-
-
-
-
 	}
 	freeifaddrs(ifaddr);
 }
 
-void commandMyport(){
-
-}
 

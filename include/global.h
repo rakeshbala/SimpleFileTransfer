@@ -19,10 +19,10 @@ and-colored-output-in-c
 
 typedef enum
 {
-	kSuccess,
-	kNotEnoughArguments,
-	kUnknownMode,
-	kInvalidPort
+	kSuccess  = 0,
+	kNotEnoughArguments = -1,
+	kUnknownMode = -2,
+	kInvalidPort = -3
 } CMD_Validation_Status;
 
 typedef enum{
@@ -30,5 +30,11 @@ typedef enum{
 	kCLIENT_MODE
 } RUNNING_MODE;
 
+typedef enum{
+	false,
+	true
+} bool;
+
 extern const char *gbl_commandArray[];
+extern int listening_port;
 #endif

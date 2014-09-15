@@ -8,6 +8,7 @@ September 8th 2014
 #include "pa1_ui.h"
 #include "global.h"
 #include "pa1_command_handler.h"
+#include "pa1_server_procs.h"
 
 /******* Include library files *********/
 #include <stdio.h>
@@ -16,32 +17,46 @@ September 8th 2014
 
 
 /******* Macros *********/
-#define PROMPT_NAME "rbalasub_pa1"
+#define PROMPT_NAME "\n[PA1]$ "
 #define ARG_ARRAY_LEN 10
 
 
 
 /******* Function declarations *********/
-void exitOrHoldCursor(RUNNING_MODE runningMode);
 
 /******* Function definitions *********/
 void startApp(RUNNING_MODE runningMode){
 
 	printf(ANSI_COLOR_GREEN "Starting application..." ANSI_COLOR_RESET);
-	printf("\n%s > ",PROMPT_NAME);
-	exitOrHoldCursor(runningMode);
+	printf(PROMPT_NAME);
+	fflush(stdout);
+
+	/******* If server, start listening *********/
+	if (runningMode == kSERVER_MODE)
+	{
+		int server_socket = setupServer();
+		if (server_socket<0)
+		{
+			fprintf(stderr, "Not able to setup server. Exiting\n");
+			exit(EXIT_FAILURE);
+		}
+		// exitOrHoldCursor(runningMode, server_socket);
+	}else if(runningMode = kCLIENT_MODE){
+		exitOrHoldCursor(runningMode, 0);		
+	}
 	
+
 }
 
 
 
-void exitOrHoldCursor(RUNNING_MODE runningMode){
+void exitOrHoldCursor(RUNNING_MODE runningMode,int server_socket){
 	/*************************************************
 	Taken code snippet from :
 	http://stackoverflow.com/questions/9278226/which-is
 	-the-best-way-to-get-input-from-user-in-c
 	*************************************************/
-	while(true){
+	// while(true){
 
 		char commandString[512];
 		if (fgets(commandString, sizeof(commandString), stdin)) {
@@ -60,13 +75,14 @@ void exitOrHoldCursor(RUNNING_MODE runningMode){
 				if (argc>10){
 					fprintf(stderr, "Too many arguments\n");
 				}
-				arg = strtok(NULL, " ");
+				arg = strtok(NULL," ");
 			}
 			
 			/******* Send tokenized commands for processing *********/
+			int status;
 			if (!(argc==0))
 			{
-				processCommandArray(argc, argv,runningMode);					
+				status = processCommandArray(argc, argv,runningMode);					
 			}
 
 			/******* Free the commands array *********/
@@ -76,13 +92,22 @@ void exitOrHoldCursor(RUNNING_MODE runningMode){
 				free(argv[ii]);
 			}
 			free (argv);
-			
-			printf("%s > ",PROMPT_NAME);
 
+			if (status<0)
+			{
+				if (runningMode = kSERVER_MODE)
+				{
+					close(server_socket);
+				}
+				exit(EXIT_SUCCESS);
+			}
+
+			printf(PROMPT_NAME);
+			fflush(stdout);
 
 
 		}else{
 			fprintf(stderr, ANSI_COLOR_RED "Some error occured." ANSI_COLOR_RESET "\n");
 		}
-	}
+	// }
 }

@@ -5,13 +5,10 @@ September 9th, 2014
 *************************************************/
 #include "global.h"
 
-#include <curses.h>
 
-#ifndef PA1_COMMAND_HANDLER_H
-#define PA1_COMMAND_HANDLER_H
+#ifndef PA1_COMMAND_HANDLER_H_
+#define PA1_COMMAND_HANDLER_H_
 
-void processCommandArray (int argc, char **argv, RUNNING_MODE runningMode);
-bool checkIfCommand(char *commandString,int *commandIndex);
-void commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runningMode);
+int processCommandArray (int argc, char **argv, RUNNING_MODE runningMode);
 
 #endif
