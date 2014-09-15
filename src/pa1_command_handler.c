@@ -88,7 +88,7 @@ int commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runnin
 E-mail	  : rbalasub@buffalo.edu\n");
 			printf("I have read and understood the course academic integrity \
 policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f14/\
-index.html#integrity\n\n"); 
+index.html#integrity\n\n");
 			break;
 		}
 		/******* dispatch HELP *********/
@@ -148,7 +148,6 @@ index.html#integrity\n\n");
 				fprintf(stderr, "Too many arguments");
 				break;
 			}
-			
 			return -1;
 		}
 
@@ -166,8 +165,8 @@ index.html#integrity\n\n");
 /******* HELP command *********/
 void commandHelp(RUNNING_MODE runningMode,char * command){
 
-	
-	
+
+
 	/******* Array to print *********/
 
 	char *clientPrintArray[13] = {
@@ -225,7 +224,7 @@ void commandMyip(){
 
 
 	/******* ifaddr Inner structure *********/
-	// struct ifaddrs  *ifa_next;     Next item in list 
+	// struct ifaddrs  *ifa_next;     Next item in list
     // char            *ifa_name;    /* Name of interface */
     // struct sockaddr *ifa_addr;    /* Address of interface */
 
@@ -242,15 +241,15 @@ void commandMyip(){
 		void * addr;
 		char * ipVersion;
 		if ((ip_family == AF_INET) && !(strcmp(ifa->ifa_name,"lo")==0))
-		{	
-			/******* Break after first IPv4 address encountered 
+		{
+			/******* Break after first IPv4 address encountered
 			which is not the loop back address *********/
 			struct sockaddr_in *ipv4 =  (struct sockaddr_in*)ifa->ifa_addr;
 			addr = &(ipv4->sin_addr);
 			char ipstr[INET6_ADDRSTRLEN];
 			inet_ntop(ip_family,addr,ipstr,sizeof ipstr);
 			printf("IP address:%s", ipstr);
-			break;	
+			break;
 		}
 	}
 	freeifaddrs(ifaddr);

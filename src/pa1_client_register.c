@@ -56,9 +56,7 @@ void commandRegister(char * destination, char *portStr){
 		if (dest_sock_addr->ai_family==AF_INET) //break at the first found IPv4 address
 		{
 			/******* sockaddr in dest_sock_addr *********/
-			char ipstr[INET6_ADDRSTRLEN];
-			inet_ntop(AF_INET,dest_sock_addr->ai_addr,ipstr,sizeof ipstr);
-			printf("Destination found :%s \n",ipstr);
+			printf("Destination found\n");
 			break;
 		}
 	}
@@ -66,7 +64,7 @@ void commandRegister(char * destination, char *portStr){
 
 	/******* Get sockaddr of destination - End *********/
 
-	int connect_socket = socket(dest_sock_addr->ai_family,
+	int connect_socket = socket( dest_sock_addr->ai_family,
 								dest_sock_addr->ai_socktype,
 								dest_sock_addr->ai_protocol);
 
