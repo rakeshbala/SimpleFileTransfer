@@ -266,7 +266,6 @@ void add_to_client_list(client_list **server_ip_lst, char *host_name, char *ip_a
         new_entry->port = malloc(6);
         strcpy(new_entry->port,port_num);
         new_entry->cl_next = *server_ip_lst;
-        new_entry->cl_next->cl_next = NULL;
         *server_ip_lst = new_entry;
         // current = *server_ip_lst;
         // current->cl_next = NULL;
