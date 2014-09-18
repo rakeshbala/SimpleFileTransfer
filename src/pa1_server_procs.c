@@ -25,7 +25,7 @@ September 13th
 int listening_port;
 
 /******* Linked list declaration for holding all ips *********/
-typedef struct server_ip_lst 
+typedef struct server_ip_lst
 {
     int connection_id;
     char * host_name;
@@ -244,27 +244,37 @@ void add_to_client_list(client_list **server_ip_lst, char *host_name, char *ip_a
     {
         current = malloc (sizeof(client_list));
         current->connection_id = 1;
-        current->host_name = host_name;
-        current->ip_addr = ip_addr;
-        current->port = port_num;
+        current->host_name = malloc(256);
+        strcpy(current->host_name,host_name);
+        current->ip_addr = malloc(256);
+        strcpy(current->ip_addr,ip_addr);
+        current->port = malloc(6);
+        strcpy(current->port,port_num);
         current->cl_next = NULL;
         *server_ip_lst = current;
 
     }else{
 
         int current_cid = current->connection_id;
-        
+
         new_entry = malloc(sizeof(client_list));
-        new_entry->connection_id = current_cid++;
-        new_entry->host_name = host_name;
-        new_entry->ip_addr = ip_addr;
-        new_entry->port = port_num;
+        new_entry->connection_id = current_cid+1;
+        new_entry->host_name = malloc(256);
+        strcpy(new_entry->host_name,host_name);
+        new_entry->ip_addr = malloc(256);
+        strcpy(new_entry->ip_addr,ip_addr);
+        new_entry->port = malloc(6);
+        strcpy(new_entry->port,port_num);
         new_entry->cl_next = *server_ip_lst;
+        new_entry->cl_next->cl_next = NULL;
         *server_ip_lst = new_entry;
+        // current = *server_ip_lst;
+        // current->cl_next = NULL;
+        // *server_ip_lst = current;
 
     }
 
-    printClientList(current);
+    printClientList(*server_ip_lst);
 }
 
 void printClientList(client_list *server_ip_lst)
