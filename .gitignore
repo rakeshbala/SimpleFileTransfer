@@ -1,3 +1,5 @@
 Makefile
 object/
 *.cbp
+*.layout
+assignment1

@@ -38,7 +38,7 @@ void commandRegister(char * destination, char *portStr)
     }
 
     /******* Get addrinfo of destination - Begin *********/
-    struct addrinfo hints, *res, *dest_sock_addr;
+    struct addrinfo hints, *res, *dest_addr_info;
     int status;
     char ipstr [INET6_ADDRSTRLEN];
 
@@ -52,11 +52,16 @@ void commandRegister(char * destination, char *portStr)
         return ;
     }
 
-    for (dest_sock_addr = res; dest_sock_addr != NULL; dest_sock_addr = dest_sock_addr->ai_next)
+    for (dest_addr_info = res; dest_addr_info != NULL; dest_addr_info = dest_addr_info->ai_next)
     {
-        if (dest_sock_addr->ai_family==AF_INET) //break at the first found IPv4 address
+        if (dest_addr_info->ai_family==AF_INET) //break at the first found IPv4 address
         {
-            /******* sockaddr in dest_sock_addr *********/
+            /******* sockaddr in dest_addr_info *********/
+            struct sockaddr_in *dest_sock_addr = (struct sockaddr_in *)dest_addr_info->ai_addr;
+            void * temp_addr = &(dest_sock_addr->sin_addr);
+            inet_ntop(AF_INET, temp_addr, ipstr,sizeof ipstr);
+            printf("Testing");
+            printf("IP : %s , Port %d\n", ipstr, ntohs(dest_sock_addr->sin_port));
             printf("Destination found\n");
             break;
         }
@@ -65,15 +70,26 @@ void commandRegister(char * destination, char *portStr)
 
     /******* Get sockaddr of destination - End *********/
 
-    int connect_socket = socket( dest_sock_addr->ai_family,
-                                 dest_sock_addr->ai_socktype,
-                                 dest_sock_addr->ai_protocol);
+    /******* Connect to server *********/
+    int connect_socket = socket( AF_INET,
+                                 SOCK_STREAM,
+                                 0);
 
-    if(connect(connect_socket, dest_sock_addr->ai_addr,res->ai_addrlen)<0)
+    if(connect(connect_socket, dest_addr_info->ai_addr,res->ai_addrlen)<0)
     {
         perror("connect");
         return;
     }
+
+    printf("Connected to server...\n");
+
+    int numBytes = send(connect_socket,portStr,sizeof portStr,0);
+    if (numBytes<0)
+    {
+        perror("Sending port failed.");
+        return;
+    }
+    printf("Registration successful");
 
     exitOrHoldCursor(kCLIENT_MODE,connect_socket);
 

@@ -7,7 +7,7 @@ September 8th, 2014
 #ifndef PA1_UI_H_
 #define PA1_UI_H_ 
 
-void startApp(RUNNING_MODE runningMode);
+void startApp(RUNNING_MODE runningMode, char *port);
 void exitOrHoldCursor(RUNNING_MODE runningMode, int listening_socket);
 
 #endif

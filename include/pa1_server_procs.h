@@ -10,6 +10,6 @@ September 13
 #define PA1_SERVER_PROCS_H_ 
 
 
-int setupServer();
+int setupServer(char *port);
 
 #endif

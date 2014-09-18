@@ -41,8 +41,7 @@ CMD_Validation_Status cmd_arg_validate (int argc, char **argv)
     printf("Checking the port number...\n");
 
 
-    int portNumber;
-    return checkPort(argv[2],&portNumber);
+    return checkPort(argv[2],&listening_port);
 }
 
 
@@ -76,7 +75,14 @@ CMD_Validation_Status checkPort (char * port, int  *portNum)
 			number between 1024 and 32767." ANSI_COLOR_RESET"\n");
         return kInvalidPort;
     }
-    *portNum = portNumber;
+
+    if (portNum!=NULL)
+    {
+        //Fill the out variable
+        *portNum = portNumber;
+
+    }
+
     return kSuccess;
 
 }

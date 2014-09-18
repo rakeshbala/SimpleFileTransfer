@@ -49,6 +49,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    /******* Setup the running mode *********/
     RUNNING_MODE runningMode;
     if (strcmp(argv[1],"c")==0||strcmp(argv[1],"C")==0)
     {
@@ -59,8 +60,10 @@ int main(int argc, char **argv)
         runningMode = kSERVER_MODE;
     }
 
-    startApp(runningMode);
-    // tearDown();
+    /******* Start the application *********/
+    char *port = argv[2];
+    startApp(runningMode,port);
+
     return 0;
 }
 

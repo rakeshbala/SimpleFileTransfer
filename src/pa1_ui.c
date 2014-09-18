@@ -25,7 +25,7 @@ September 8th 2014
 /******* Function declarations *********/
 
 /******* Function definitions *********/
-void startApp(RUNNING_MODE runningMode)
+void startApp(RUNNING_MODE runningMode, char * port)
 {
 
     printf(ANSI_COLOR_GREEN "Starting application..." ANSI_COLOR_RESET);
@@ -35,7 +35,7 @@ void startApp(RUNNING_MODE runningMode)
     /******* If server, start listening *********/
     if (runningMode == kSERVER_MODE)
     {
-        int server_socket = setupServer();
+        int server_socket = listen_at_port(port);
         if (server_socket<0)
         {
             fprintf(stderr, "Not able to setup server. Exiting\n");
