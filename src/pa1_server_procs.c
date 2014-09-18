@@ -179,19 +179,19 @@ int listen_at_port(char * port)
                             fd_max = new_fd;
                         }
                         printf("New connection from %s on %d \n",
-                         inet_ntop(remoteaddr.ss_family,
-                           get_in_addr((struct sockaddr*)&remoteaddr),
-                           remoteIP, INET6_ADDRSTRLEN),
-                         new_fd);
+                               inet_ntop(remoteaddr.ss_family,
+                                         get_in_addr((struct sockaddr*)&remoteaddr),
+                                         remoteIP, INET6_ADDRSTRLEN),
+                               new_fd);
 
                         //get host name
                         char host_name [256];
                         char service[20];
                         int name_status;
                         if (getnameinfo((struct sockaddr *)&remoteaddr,
-                            sizeof remoteIP,
-                            host_name,
-                            sizeof host_name,service,sizeof service,0 )<0)
+                                        sizeof remoteIP,
+                                        host_name,
+                                        sizeof host_name,service,sizeof service,0 )<0)
                         {
                             fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
                         }
@@ -253,10 +253,11 @@ void add_to_client_list(client_list **server_ip_lst, char *host_name, char *ip_a
         current->cl_next = NULL;
         *server_ip_lst = current;
 
-    }else{
+    }
+    else
+    {
 
         int current_cid = current->connection_id;
-
         new_entry = malloc(sizeof(client_list));
         new_entry->connection_id = current_cid+1;
         new_entry->host_name = malloc(256);
@@ -267,25 +268,21 @@ void add_to_client_list(client_list **server_ip_lst, char *host_name, char *ip_a
         strcpy(new_entry->port,port_num);
         new_entry->cl_next = *server_ip_lst;
         *server_ip_lst = new_entry;
-        // current = *server_ip_lst;
-        // current->cl_next = NULL;
-        // *server_ip_lst = current;
-
     }
 
     printClientList(*server_ip_lst);
 }
+
 
 void printClientList(client_list *server_ip_lst)
 {
     client_list *print_list;
     for (print_list = server_ip_lst; print_list!= NULL; print_list = print_list->cl_next)
     {
-        printf("%d %s %s %s\n",print_list->connection_id
-          ,print_list->host_name
-          ,print_list->ip_addr
-          ,print_list->port);
-
+        printf("%-5d%-35s%-20s%-8s\n",print_list->connection_id,
+               print_list->host_name,
+               print_list->ip_addr,
+               print_list->port);
     }
 
 }
