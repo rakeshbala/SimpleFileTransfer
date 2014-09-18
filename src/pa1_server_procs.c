@@ -260,7 +260,7 @@ void add_to_client_list(client_list **server_ip_lst, char *host_name, char *ip_a
         new_entry->ip_addr = ip_addr;
         new_entry->port = port_num;
         new_entry->cl_next = *server_ip_lst;
-        *server_ip_lst = current;
+        *server_ip_lst = new_entry;
 
     }
 
