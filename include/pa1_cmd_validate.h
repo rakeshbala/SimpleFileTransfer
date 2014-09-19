@@ -11,6 +11,6 @@
 #define PA1_CMD_VALIDATE_H_
 
 CMD_Validation_Status cmd_arg_validate (int argc, char **argv);
-CMD_Validation_Status checkPort (char * port, int  *portNum);
+CMD_Validation_Status checkPort (char * port);
 
 #endif

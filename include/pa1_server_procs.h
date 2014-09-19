@@ -10,6 +10,6 @@ September 13
 #define PA1_SERVER_PROCS_H_ 
 
 
-int setupServer(char *port);
+int listen_at_port(RUNNING_MODE runningMode, char *port);
 
 #endif

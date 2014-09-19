@@ -12,7 +12,7 @@
 #include "global.h"
 #include <string.h>
 
-int listening_port;
+char * listening_port;
 
 CMD_Validation_Status cmd_arg_validate (int argc, char **argv)
 {
@@ -40,12 +40,18 @@ CMD_Validation_Status cmd_arg_validate (int argc, char **argv)
     /******* Check for valid port number *********/
     printf("Checking the port number...\n");
 
+    CMD_Validation_Status port_check = checkPort(argv[2]);
+    if (port_check==kSuccess)   
+    {
+        listening_port = argv[2];
 
-    return checkPort(argv[2],&listening_port);
+    }
+
+    return port_check;
 }
 
 
-CMD_Validation_Status checkPort (char * port, int  *portNum)
+CMD_Validation_Status checkPort (char * port)
 {
 
     /******* Check if number *********/
@@ -75,14 +81,6 @@ CMD_Validation_Status checkPort (char * port, int  *portNum)
 			number between 1024 and 32767." ANSI_COLOR_RESET"\n");
         return kInvalidPort;
     }
-
-    if (portNum!=NULL)
-    {
-        //Fill the out variable
-        *portNum = portNumber;
-
-    }
-
     return kSuccess;
 
 }

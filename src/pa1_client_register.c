@@ -23,14 +23,13 @@ September 14th 2014
 #include <netdb.h>
 
 
-int listening_port;
+char * listening_port;
 
 void commandRegister(char * destination, char *portStr)
 {
 
     /******* Validate port *********/
-    int portNumber;
-    CMD_Validation_Status portStatus = checkPort(portStr,&portNumber);
+    CMD_Validation_Status portStatus = checkPort(portStr);
     if (portStatus!=kSuccess)
     {
         fprintf(stderr, "Invalid Port\n");
@@ -81,17 +80,19 @@ void commandRegister(char * destination, char *portStr)
         return;
     }
 
-    printf("Connected to server...\n");
-
-    int numBytes = send(connect_socket,portStr,sizeof portStr,0);
+    char commandStr[16]; 
+    strcat(commandStr,"register ");
+    strcat(commandStr,listening_port);
+    strcat(commandStr," ");
+    int numBytes = send(connect_socket,commandStr, strlen(commandStr),0);
     if (numBytes<0)
     {
         perror("Sending port failed.");
         return;
     }
-    printf("Registration successful");
+    printf("Connected to server...\n");
 
-    exitOrHoldCursor(kCLIENT_MODE,connect_socket);
+    // exitOrHoldCursor(kCLIENT_MODE,connect_socket);
 
 
 }

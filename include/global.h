@@ -17,6 +17,8 @@ and-colored-output-in-c
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
+#define PROMPT_NAME "[PA1]$ "
+
 typedef enum
 {
     kSuccess  = 0,
@@ -37,6 +39,20 @@ typedef enum
     true
 } bool;
 
+
+/******* Linked list declaration for holding all ips *********/
+typedef struct theList
+{
+    int connection_id;
+    int file_desc;
+    char * host_name;
+    char * ip_addr;
+    char * port;
+
+    struct theList * cl_next;
+
+} client_list;
+
 extern const char *gbl_commandArray[];
-extern int listening_port;
+extern char * listening_port;
 #endif

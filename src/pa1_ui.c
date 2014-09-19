@@ -17,7 +17,6 @@ September 8th 2014
 
 
 /******* Macros *********/
-#define PROMPT_NAME "\n[PA1]$ "
 #define ARG_ARRAY_LEN 10
 
 
@@ -29,31 +28,23 @@ void startApp(RUNNING_MODE runningMode, char * port)
 {
 
     printf(ANSI_COLOR_GREEN "Starting application..." ANSI_COLOR_RESET);
+    printf("\n");
     printf(PROMPT_NAME);
     fflush(stdout);
 
     /******* If server, start listening *********/
-    if (runningMode == kSERVER_MODE)
+    int server_socket = listen_at_port(runningMode,port);
+    if (server_socket<0)
     {
-        int server_socket = listen_at_port(port);
-        if (server_socket<0)
-        {
-            fprintf(stderr, "Not able to setup server. Exiting\n");
-            exit(EXIT_FAILURE);
-        }
+        fprintf(stderr, "Not able to setup server. Exiting\n");
+        exit(EXIT_FAILURE);
+    }
         // exitOrHoldCursor(runningMode, server_socket);
-    }
-    else if(runningMode = kCLIENT_MODE)
-    {
-        exitOrHoldCursor(runningMode, 0);
-    }
-
-
 }
 
 
 
-void exitOrHoldCursor(RUNNING_MODE runningMode,int server_socket)
+void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket)
 {
     /*************************************************
     Taken code snippet from :
@@ -65,6 +56,8 @@ void exitOrHoldCursor(RUNNING_MODE runningMode,int server_socket)
     char commandString[512];
     if (fgets(commandString, sizeof(commandString), stdin))
     {
+
+        /******* Handle enter key press  *********/
         commandString[strlen(commandString)-1]='\0'; //remove new line
 
         /******* From recitation slide *********/
@@ -81,6 +74,7 @@ void exitOrHoldCursor(RUNNING_MODE runningMode,int server_socket)
             if (argc>10)
             {
                 fprintf(stderr, "Too many arguments\n");
+                return;
             }
             arg = strtok(NULL," ");
         }
@@ -90,33 +84,28 @@ void exitOrHoldCursor(RUNNING_MODE runningMode,int server_socket)
         if (!(argc==0))
         {
             status = processCommandArray(argc, argv,runningMode);
-        }
-
-        /******* Free the commands array *********/
-        int ii =0;
-        for (ii = 0; ii < argc; ++ii)
-        {
-            free(argv[ii]);
-        }
-        free (argv);
-
-        if (status<0)
-        {
-            if (runningMode = kSERVER_MODE)
+            /******* Free the commands array *********/
+            int ii =0;
+            for (ii = 0; ii < argc; ++ii)
             {
-                close(server_socket);
+                free(argv[ii]);
             }
-            exit(EXIT_SUCCESS);
+            free (argv);
+            if (status<0)
+            {
+                if (runningMode = kSERVER_MODE)
+                {
+                    close(listening_socket);
+                }
+                exit(EXIT_SUCCESS);
+            }
+            printf("\n");
         }
-
         printf(PROMPT_NAME);
         fflush(stdout);
-
-
     }
     else
     {
         fprintf(stderr, ANSI_COLOR_RED "Some error occured." ANSI_COLOR_RESET "\n");
     }
-    // }
 }

@@ -19,30 +19,17 @@ September 13th
 #include <string.h>
 #include <stdio.h>
 
+char * listening_port;
 
 
-
-int listening_port;
-
-/******* Linked list declaration for holding all ips *********/
-typedef struct server_ip_lst
-{
-    int connection_id;
-    char * host_name;
-    char * ip_addr;
-    char * port;
-
-    struct server_ip_lst * cl_next;
-
-} client_list;
 
 
 /******* Function declarations *********/
-void add_to_client_list(client_list ** server_ip_lst,char *host_name, char *ip_addr, char *port_num);
-void printClientList(client_list *server_ip_lst);
+char * create_list_string(client_list *theList);
+void publish_list_to_client(char * ntw_string, int file_desc);
 
 
-int listen_at_port(char * port)
+int listen_at_port(RUNNING_MODE runningMode, char * port)
 {
 
 
@@ -50,23 +37,24 @@ int listen_at_port(char * port)
     fd_set master;
     fd_set read_fds; //temp for select()
     int fd_max; //tracking maximum fd_set
-    int server_socket ; //socket to listen
+    int listening_socket ; //socket to listen
     int new_fd; //new socket when client connects
 
     struct sockaddr_storage remoteaddr; // client address
     socklen_t addrlen;  //length of address
     char remoteIP[INET6_ADDRSTRLEN];  //String for input address
 
-    char buf[256];  //256 bytes long buffer
-    int nbytes;
     int yes = 1;
+
+
+    char host_name [256]; //for incoming connections
+    char service[20];
 
     int ii, jj; //loop variables
     int errorVar; //For reporting error with gai_strerror
 
     struct addrinfo hints, *receive_ai, *working_ai;
-
-    client_list * server_ip_lst = NULL;
+    client_list * theList = NULL;
     /******* Declarations End *********/
 
 
@@ -79,7 +67,7 @@ int listen_at_port(char * port)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if (checkPort(port,NULL)!=kSuccess)
+    if (checkPort(port)!=kSuccess)
     {
         return;
     }
@@ -97,19 +85,19 @@ int listen_at_port(char * port)
     {
 
         /******* Create the socket if not continue the loop looking for other*********/
-        server_socket =  socket(working_ai->ai_family,working_ai->ai_socktype, 0);
-        if (server_socket<0)
+        listening_socket =  socket(working_ai->ai_family,working_ai->ai_socktype, 0);
+        if (listening_socket<0)
         {
             continue;
         }
 
         /******* Make socket resuable *********/
-        setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+        setsockopt(listening_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 
         /******* Bind else use another socket *********/
-        if (bind(server_socket, working_ai->ai_addr, working_ai->ai_addrlen)<0)
+        if (bind(listening_socket, working_ai->ai_addr, working_ai->ai_addrlen)<0)
         {
-            close(server_socket);
+            close(listening_socket);
             continue;
         }
         break;
@@ -127,7 +115,7 @@ int listen_at_port(char * port)
 
 
     /******* Listen for connections *********/
-    if (listen(server_socket,10)<0)
+    if (listen(listening_socket,10)<0)
     {
         perror("listen");
         exit(EXIT_FAILURE);
@@ -135,8 +123,8 @@ int listen_at_port(char * port)
 
 
     FD_SET(0,&master); // stdin for select()
-    FD_SET(server_socket, &master); //for listening for connections
-    fd_max = server_socket;
+    FD_SET(listening_socket, &master); //for listening for connections
+    fd_max = listening_socket;
 
 
 
@@ -145,7 +133,6 @@ int listen_at_port(char * port)
     {
 
         read_fds = master; //going to select();
-
         if (select(fd_max+1, &read_fds, NULL, NULL, NULL) == -1)
         {
             perror("select");
@@ -158,13 +145,13 @@ int listen_at_port(char * port)
                 /******* Take input from command line *********/
                 if(ii == 0)
                 {
-                    exitOrHoldCursor(kSERVER_MODE,server_socket);
+                    exitOrHoldCursor(runningMode,listening_socket);
                 }
                 /******* Check for incoming connections *********/
-                else if (ii == server_socket)
+                else if (ii == listening_socket)
                 {
                     addrlen = sizeof remoteaddr;
-                    new_fd = accept(server_socket,(struct sockaddr*)&remoteaddr, &addrlen);
+                    new_fd = accept(listening_socket,(struct sockaddr*)&remoteaddr, &addrlen);
 
                     if (new_fd == -1)
                     {
@@ -178,38 +165,42 @@ int listen_at_port(char * port)
                         {
                             fd_max = new_fd;
                         }
-                        printf("New connection from %s on %d \n",
-                               inet_ntop(remoteaddr.ss_family,
-                                         get_in_addr((struct sockaddr*)&remoteaddr),
-                                         remoteIP, INET6_ADDRSTRLEN),
-                               new_fd);
+                        printf("\nNew connection from %s on %d...\n",
+                         inet_ntop(remoteaddr.ss_family,
+                           get_in_addr((struct sockaddr*)&remoteaddr),
+                           remoteIP, INET6_ADDRSTRLEN),
+                         new_fd);
 
                         //get host name
-                        char host_name [256];
-                        char service[20];
+
                         int name_status;
                         if (getnameinfo((struct sockaddr *)&remoteaddr,
-                                        sizeof remoteIP,
-                                        host_name,
-                                        sizeof host_name,service,sizeof service,0 )<0)
+                            sizeof remoteIP,
+                            host_name,
+                            sizeof host_name,service,sizeof service,0 )<0)
                         {
                             fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
                         }
 
-                        add_to_client_list(&server_ip_lst, host_name, remoteIP, "9999");
+                        /******* Push it to the client list *********/
+                        add_to_client_list(&theList, new_fd, host_name, remoteIP);
 
                     }
                 }
-                else
+                else// handle data from a client
                 {
-                    // handle data from a client
+                    char buf[256];  //256 bytes long buffer
+                    int nbytes;
                     if ((nbytes = recv(ii, buf, sizeof buf, 0)) <= 0)
                     {
                         // got error or connection closed by client
                         if (nbytes == 0)
                         {
                             // connection closed
-                            printf("selectserver: socket %d hung up\n", ii);
+                            remove_from_client_list(&theList,ii);
+                            printf(PROMPT_NAME);
+                            fflush(stdout);
+                            // printf("selectserver: socket %d hung up\n", ii);
                         }
                         else
                         {
@@ -221,72 +212,84 @@ int listen_at_port(char * port)
                     else
                     {
                         /******* Data received *********/
-                        printf ("Recieved: %s\n",buf);
-                        fflush(stdout);
+                        char *arg;
+                        int argc = 0;
+                        char **argv = (char **)malloc(3);
+                        arg = strtok(buf," ");
+                        while(arg){
+                            argv[argc] = (char *)malloc(strlen(arg)+1);
+                            strcpy(argv[argc],arg);
+                            argc++;
+                            arg = strtok(NULL," ");
+                        }
 
+                        printf ("Recieved commands: %s %s\n",argv[0],argv[1]);
+                        /******* Handle the register command from client *********/
+                        if (strcmp(argv[0],"register")==0)
+                        {
+                            add_port_to_client(theList,ii,argv[1]);
+                            char *ntw_string = create_list_string(theList);
+
+                            /******* From Beej's network programming guide *********/
+                            int j;
+                            for (j = 0; j <= fd_max; ++j)
+                            {
+                                if (FD_ISSET(j,&master))
+                                {
+                                    if (j!=0 && j!=listening_socket)
+                                    {
+                                        publish_list_to_client(ntw_string,j);
+                                    }
+                                }
+                            }
+                            
+
+                            printf("\n");
+                            printf(PROMPT_NAME);
+
+                        }
+                        fflush(stdout);
+                        int loopF;
+                        for (loopF = 0; loopF < argc; ++loopF)
+                        {
+                            free(argv[loopF]);
+                        }
+                        free(argv);
                     }
-                }
+                } 
             }
         }
     }
-    return server_socket;
+    freeLinkedList(theList);
+    return listening_socket;
 
 }
 
 
-void add_to_client_list(client_list **server_ip_lst, char *host_name, char *ip_addr, char *port_num)
+
+char * create_list_string(client_list *theList)
 {
-
-    client_list *current = *server_ip_lst;
-    client_list *new_entry;
-
-    if (current == NULL)
-    {
-        current = malloc (sizeof(client_list));
-        current->connection_id = 1;
-        current->host_name = malloc(256);
-        strcpy(current->host_name,host_name);
-        current->ip_addr = malloc(256);
-        strcpy(current->ip_addr,ip_addr);
-        current->port = malloc(6);
-        strcpy(current->port,port_num);
-        current->cl_next = NULL;
-        *server_ip_lst = current;
-
+    char *ntw_string = (char *)malloc(1024);
+    strcat(ntw_string,"server-ip-list ");
+    client_list* loopList = theList;
+    while(loopList!=NULL){
+        strcat(ntw_string,loopList->ip_addr);
+        strcat(ntw_string,",");
+        strcat(ntw_string,loopList->port);
+        strcat(ntw_string,";"); //entry separator
+        loopList = loopList->cl_next;
     }
-    else
-    {
+    strcat(ntw_string," ");
 
-        int current_cid = current->connection_id;
-        new_entry = malloc(sizeof(client_list));
-        new_entry->connection_id = current_cid+1;
-        new_entry->host_name = malloc(256);
-        strcpy(new_entry->host_name,host_name);
-        new_entry->ip_addr = malloc(256);
-        strcpy(new_entry->ip_addr,ip_addr);
-        new_entry->port = malloc(6);
-        strcpy(new_entry->port,port_num);
-        new_entry->cl_next = *server_ip_lst;
-        *server_ip_lst = new_entry;
-    }
-
-    printClientList(*server_ip_lst);
+    return ntw_string;
 }
 
+void publish_list_to_client(char *ntw_string,int file_desc){
 
-void printClientList(client_list *server_ip_lst)
-{
-    client_list *print_list;
-    for (print_list = server_ip_lst; print_list!= NULL; print_list = print_list->cl_next)
+    if (send(file_desc, ntw_string,sizeof(ntw_string),0)<0)
     {
-        printf("%-5d%-35s%-20s%-8s\n",print_list->connection_id,
-               print_list->host_name,
-               print_list->ip_addr,
-               print_list->port);
+        perror("send");
+        return;
     }
-
+    printf("Published list %s to client..\n",ntw_string);
 }
-
-
-
-

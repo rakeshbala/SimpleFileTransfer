@@ -24,7 +24,7 @@ const char *gbl_commandArray[]= {"CREATOR\0","HELP\0",
                                  "TERMINATE\0","EXIT\0","UPLOAD\0","DOWNLOAD\0","STATISTICS\0","CLEAR\0"
                                 };
 
-int listening_port;
+char * listening_port;
 
 /******* Macros *********/
 
@@ -135,7 +135,7 @@ index.html#integrity\n\n");
             fprintf(stderr, "Too many arguments");
             break;
         }
-        printf("Port number:%d", listening_port);
+        printf("Port number:%s", listening_port);
         break;
     }
 
