@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
 
@@ -55,4 +57,6 @@ typedef struct theList
 
 extern const char *gbl_commandArray[];
 extern char * listening_port;
+extern fd_set master;
+extern int fd_max;
 #endif

@@ -3,6 +3,8 @@ Rakesh Balasubramanian
 
 September 14th 2014
 *************************************************/
+#include "global.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,3 +30,41 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 
+/*************************************************
+Idea from
+http://stackoverflow.com/questions/13479760/c-
+socket-recv-and-send-all-data
+*************************************************/
+bool send_all(int socket_fd, char *buffer,int buffer_len){
+
+	char *ptr =  buffer;
+	while(buffer_len>0){
+		int bytesSent = send(socket_fd,ptr,buffer_len,0);
+		if (bytesSent<0)
+		{
+			perror("send");
+		}
+		ptr += bytesSent;
+		buffer_len -= bytesSent;
+	}	
+
+}
+
+
+
+bool recv_all(int socket_fd, char *buffer,int buffer_len){
+
+	char temp[buffer_len];
+	int tempLen= buffer_len; 
+	while(tempLen>0){
+		int bytesRecv = recv(socket_fd,temp,tempLen,0);
+		if (bytesRecv<0)
+		{
+			perror("recv");
+			return false;
+		}
+		strcat(buffer,temp);
+		tempLen -= bytesRecv;
+	}	
+	return true;
+}

@@ -80,8 +80,14 @@ void commandRegister(char * destination, char *portStr)
         return;
     }
 
+    FD_SET(connect_socket,&master);
+    if (connect_socket>fd_max)
+    {
+        fd_max = connect_socket;
+    }
+
     char commandStr[16]; 
-    strcat(commandStr,"register ");
+    strcat(commandStr,"16 register ");
     strcat(commandStr,listening_port);
     strcat(commandStr," ");
     int numBytes = send(connect_socket,commandStr, strlen(commandStr),0);

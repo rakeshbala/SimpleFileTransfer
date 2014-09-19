@@ -22,7 +22,8 @@ September 13th
 char * listening_port;
 
 
-
+fd_set master; //master file desc set
+int fd_max; //tracking maximum fd_set
 
 /******* Function declarations *********/
 char * create_list_string(client_list *theList);
@@ -34,9 +35,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 
 
     /******* Variable Declarations Begin *********/
-    fd_set master;
     fd_set read_fds; //temp for select()
-    int fd_max; //tracking maximum fd_set
     int listening_socket ; //socket to listen
     int new_fd; //new socket when client connects
 
@@ -189,9 +188,9 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                 }
                 else// handle data from a client
                 {
-                    char buf[256];  //256 bytes long buffer
+                    char recv_buf[256];  //256 bytes long recv_buffer
                     int nbytes;
-                    if ((nbytes = recv(ii, buf, sizeof buf, 0)) <= 0)
+                    if ((nbytes = recv(ii, recv_buf, sizeof recv_buf, 0)) <= 0)
                     {
                         // got error or connection closed by client
                         if (nbytes == 0)
@@ -212,10 +211,22 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                     else
                     {
                         /******* Data received *********/
-                        char *arg;
+
+                        /******* Make sure all input is received *********/
+                        char *arg; //var for storing tokenized input
+                        char *recv_bufCopy = malloc(256); // needed since strtok modifies string
+                        strcpy(recv_bufCopy,recv_buf);
+                        arg = strtok(recv_bufCopy," ");
+                        int commandLen = strtol(arg,NULL,10);
+                        recv_all(ii,recv_buf,commandLen-nbytes);
+                        free(recv_bufCopy);
+                        /******* All inputs received *********/
+
+                        /******* Tokenize and process *********/
                         int argc = 0;
                         char **argv = (char **)malloc(3);
-                        arg = strtok(buf," ");
+                        printf("Raw : %s %d\n", recv_buf,nbytes);
+                        arg = strtok(recv_buf," ");
                         while(arg){
                             argv[argc] = (char *)malloc(strlen(arg)+1);
                             strcpy(argv[argc],arg);
@@ -223,11 +234,12 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             arg = strtok(NULL," ");
                         }
 
-                        printf ("Recieved commands: %s %s\n",argv[0],argv[1]);
+                        
+
                         /******* Handle the register command from client *********/
-                        if (strcmp(argv[0],"register")==0)
+                        if (strcmp(argv[1],"register")==0)
                         {
-                            add_port_to_client(theList,ii,argv[1]);
+                            add_port_to_client(theList,ii,argv[2]);
                             char *ntw_string = create_list_string(theList);
 
                             /******* From Beej's network programming guide *********/
@@ -286,10 +298,6 @@ char * create_list_string(client_list *theList)
 
 void publish_list_to_client(char *ntw_string,int file_desc){
 
-    if (send(file_desc, ntw_string,sizeof(ntw_string),0)<0)
-    {
-        perror("send");
-        return;
-    }
+    send_all(file_desc,ntw_string,strlen(ntw_string));
     printf("Published list %s to client..\n",ntw_string);
 }
