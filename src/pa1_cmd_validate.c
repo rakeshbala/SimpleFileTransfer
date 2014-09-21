@@ -22,7 +22,7 @@ CMD_Validation_Status cmd_arg_validate (int argc, char **argv)
     if (argc != 3)
     {
         fprintf(stderr, ANSI_COLOR_RED "usage: rbalasub_assignment1 \
-			[s c] <port>" ANSI_COLOR_RESET "\n");
+[s c] <port>" ANSI_COLOR_RESET "\n");
         return kNotEnoughArguments;
     }
 
@@ -33,7 +33,7 @@ CMD_Validation_Status cmd_arg_validate (int argc, char **argv)
     {
         /* code */
         fprintf(stderr, ANSI_COLOR_RED "Unknown mode. User either \
-			option c or s" ANSI_COLOR_RESET"\n");
+option c or s" ANSI_COLOR_RESET"\n");
         return kUnknownMode;
     }
 
@@ -68,7 +68,7 @@ CMD_Validation_Status checkPort (char * port)
     if (i>portLength)
     {
         fprintf(stderr, ANSI_COLOR_RED "Invalid port number. Enter \
-			only number." ANSI_COLOR_RESET "\n");
+only number." ANSI_COLOR_RESET "\n");
         return kInvalidPort;
     }
 
@@ -78,7 +78,7 @@ CMD_Validation_Status checkPort (char * port)
     if (portNumber<1024||portNumber>32767)
     {
         fprintf(stderr, ANSI_COLOR_RED "Invalid port number. Enter port \
-			number between 1024 and 32767." ANSI_COLOR_RESET"\n");
+number between 1024 and 32767." ANSI_COLOR_RESET"\n");
         return kInvalidPort;
     }
     return kSuccess;

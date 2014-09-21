@@ -31,7 +31,8 @@ char * listening_port;
 
 /******* Function declarations *********/
 bool checkIfCommand(char *commandString,int *commandIndex);
-int commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runningMode);
+int commandDispatch(int argc, char **argv, int commandIndex,
+                    RUNNING_MODE runningMode, client_list *theList);
 
 void commandHelp(RUNNING_MODE runningMode, char *command);
 void commandMyip();
@@ -40,7 +41,7 @@ void commandMyport();
 
 
 
-int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode)
+int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode, client_list *theList)
 {
 
     /******* Check if valid command and get command index *********/
@@ -57,7 +58,7 @@ int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode)
 
 
     /******* Dispatch commands to their functions *********/
-    return commandDispatch(argc,argv,commandIndex,runningMode);
+    return commandDispatch(argc,argv,commandIndex,runningMode,theList);
 
 
 }
@@ -81,7 +82,8 @@ bool checkIfCommand(char *commandString,int *index)
 }
 
 
-int commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runningMode)
+int commandDispatch(int argc, char **argv, int commandIndex,
+                    RUNNING_MODE runningMode, client_list *theList)
 {
     switch (commandIndex)
     {
@@ -97,7 +99,7 @@ int commandDispatch(int argc, char **argv, int commandIndex, RUNNING_MODE runnin
 E-mail	  : rbalasub@buffalo.edu\n");
         printf("I have read and understood the course academic integrity \
 policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f14/\
-index.html#integrity\n\n");
+    index.html#integrity\n\n");
         break;
     }
     /******* dispatch HELP *********/
@@ -153,7 +155,7 @@ index.html#integrity\n\n");
             break;
         }
 
-        commandRegister(argv[1],argv[2]);
+        commandRegister(argv[1],argv[2],theList);
         break;
     }
 
@@ -195,19 +197,19 @@ void commandHelp(RUNNING_MODE runningMode,char * command)
         "HELP - Prints help information",
         "MYIP - Display the IP address of this process",
         "MYPORT - DDisplay the port on which this process \
-is listening for incoming connections.",
+            is listening for incoming connections.",
         "REGISTER - Registers the client with the server.\
-\n  Usage: REGISTER <SERVER IP> <PORT NO>",
+            \n  Usage: REGISTER <SERVER IP> <PORT NO>",
         "CONNECT - Connects to a peer.\nUsage: CONNECT <DE\
-STINATION> <PORT NO>",
+            STINATION> <PORT NO>",
         "LIST - Display all connections",
         "TERMINATE - Terminate a connection using the connection id\
-\n  <Usage: TERMINATE <CONNECTION ID>",
+            \n  <Usage: TERMINATE <CONNECTION ID>",
         "EXIT - Close all connections and exit the process",
         "UPLOAD - Uploads a file to a peer.\n  Usage: UPLOAD \
-<CONNECTION ID> <FILE NAME>",
+            <CONNECTION ID> <FILE NAME>",
         "DOWNLOAD - Downloads a file from a peer.\n  Usage: DOWNLOAD \
-<CONNECTION ID1> <FILE NAME1> <CONNECTION ID2> <FILE NAME2> ..",
+            <CONNECTION ID1> <FILE NAME1> <CONNECTION ID2> <FILE NAME2> ..",
         "STATISTICS - Display statistics",
         "CLEAR - Clear the screen"
     };

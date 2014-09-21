@@ -8,7 +8,7 @@ September 8th 2014
 #include "pa1_ui.h"
 #include "global.h"
 #include "pa1_command_handler.h"
-#include "pa1_server_procs.h"
+#include "pa1_listen_procs.h"
 
 /******* Include library files *********/
 #include <stdio.h>
@@ -39,12 +39,11 @@ void startApp(RUNNING_MODE runningMode, char * port)
         fprintf(stderr, "Not able to setup server. Exiting\n");
         exit(EXIT_FAILURE);
     }
-        // exitOrHoldCursor(runningMode, server_socket);
 }
 
 
 
-void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket)
+void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket, client_list *theList)
 {
     /*************************************************
     Taken code snippet from :
@@ -64,12 +63,12 @@ void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket)
         /******* Tokenize input *********/
         char *arg;
         int argc=0;
-        char **argv = (char **)malloc(ARG_ARRAY_LEN);
+        char **argv = (char **)calloc(ARG_ARRAY_LEN, sizeof (char*));
         arg = strtok(commandString, " ");
         while(arg)
         {
-            argv[argc]=(char *)malloc(strlen(arg)+1);
-            strcpy(argv[argc],arg);
+            // argv[argc]=(char *)calloc(strlen(arg)+1,sizeof(char));
+            argv[argc] = strdup(arg);
             argc++;
             if (argc>10)
             {
@@ -83,7 +82,7 @@ void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket)
         int status;
         if (!(argc==0))
         {
-            status = processCommandArray(argc, argv,runningMode);
+            status = processCommandArray(argc, argv,runningMode,theList);
             /******* Free the commands array *********/
             int ii =0;
             for (ii = 0; ii < argc; ++ii)

@@ -25,23 +25,25 @@ September 14th 2014
 
 char * listening_port;
 
-void commandRegister(char * destination, char *portStr)
+void commandRegister(char * destination, char *portStr, client_list *theList)
 {
 
     /******* Validate port *********/
     CMD_Validation_Status portStatus = checkPort(portStr);
     if (portStatus!=kSuccess)
     {
-        fprintf(stderr, "Invalid Port\n");
+        fprintf(stderr, "Invalid Port\n");  
         return;
     }
 
     /******* Get addrinfo of destination - Begin *********/
-    struct addrinfo hints, *res, *dest_addr_info;
+    struct addrinfo hints, *res, *dest_addr_info ;
+
     int status;
     char ipstr [INET6_ADDRSTRLEN];
 
     memset (&hints, 0,sizeof hints);
+
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
@@ -74,7 +76,7 @@ void commandRegister(char * destination, char *portStr)
                                  SOCK_STREAM,
                                  0);
 
-    if(connect(connect_socket, dest_addr_info->ai_addr,res->ai_addrlen)<0)
+    if(connect(connect_socket, dest_addr_info->ai_addr,dest_addr_info->ai_addrlen)<0)
     {
         perror("connect");
         return;
@@ -86,7 +88,7 @@ void commandRegister(char * destination, char *portStr)
         fd_max = connect_socket;
     }
 
-    char commandStr[16]; 
+    char *commandStr = (char *)calloc(18, sizeof(char));
     strcat(commandStr,"16 register ");
     strcat(commandStr,listening_port);
     strcat(commandStr," ");
@@ -97,8 +99,60 @@ void commandRegister(char * destination, char *portStr)
         return;
     }
     printf("Connected to server...\n");
+    free(commandStr);
 
-    // exitOrHoldCursor(kCLIENT_MODE,connect_socket);
+
+    //get server name
+    int name_status;
+    char host_name [256];
+    char service[20];
+    if (getnameinfo(dest_addr_info->ai_addr,
+                        dest_addr_info->ai_addrlen,
+                        host_name,
+                        sizeof host_name,service,
+                        sizeof service,0 )<0)
+    {
+        fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
+    }
 
 
+    add_to_client_list(&theList, connect_socket, host_name,ipstr);
+    add_port_to_client(theList,connect_socket,portStr);
+}
+
+void parseAndPrintSIPList(char *SIPlist){
+
+    printf("\n                            Available peers                              \n");
+    printf("-------------------------------------------------------------------------\n");
+    printf("%-35s%-20s%-8s\n","Host name","IP Address","Port");
+    printf("-------------------------------------------------------------------------\n");
+    char *container;
+    char *strTokInt;
+    container = strtok_r(SIPlist,";",&strTokInt);
+
+    while (container)
+    {
+
+        int argc=0;
+        char **tokenArray = (char **)calloc(3, sizeof(char *));
+        char * container2;
+        char * strTokInt2;
+        container2 = strtok_r(container,",",&strTokInt2);
+        while (container2)
+        {
+            // tokenArray[argc] = calloc(strlen(container2)+1, sizeof(char));
+            tokenArray[argc] = strdup(container2);
+            argc++;
+            container2 = strtok_r(NULL,",",&strTokInt2);
+        }
+        printf("%-35s%-20s%-8s\n",tokenArray[0],tokenArray[1],tokenArray[2]);
+        int i;
+        for (i = 0; i < argc; ++i)
+        {
+            free(tokenArray[i]);
+        }
+        free(tokenArray);
+        container = strtok_r(NULL,";",&strTokInt);
+
+    }
 }

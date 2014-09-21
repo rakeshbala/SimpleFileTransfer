@@ -7,7 +7,7 @@ September 19th
 #include "pa1_client_list_util.h"
 
 #include "global.h"
-#include "pa1_server_procs.h"
+#include "pa1_listen_procs.h"
 #include "pa1_ui.h"
 #include "pa1_cmd_validate.h"
 #include "pa1_network_util.h"
@@ -20,6 +20,7 @@ September 19th
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
 /*************************************************
 Psuedo-code/code used from 
 http://www.learn-c.org/en/Linked_lists - Begin
@@ -33,13 +34,13 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
 
     if (current == NULL) //Create new list if NULL
     {
-        current = malloc (sizeof(client_list));
+        current = calloc (1,sizeof(client_list));
         current->connection_id = 1;
         current->file_desc = file_desc;
-        current->host_name = malloc(256);
-        strcpy(current->host_name,host_name);
-        current->ip_addr = malloc(256);
-        strcpy(current->ip_addr,ip_addr);
+        // current->host_name = calloc(256, sizeof(char));
+        current->host_name = strdup(host_name);
+        // current->ip_addr = calloc(256, sizeof(char));
+        current->ip_addr = strdup(ip_addr);
         current->cl_next = NULL;
         *theList = current;
 
@@ -48,13 +49,13 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
     {
 
         int current_cid = current->connection_id;
-        new_entry = malloc(sizeof(client_list));
+        new_entry = calloc(1, sizeof(client_list));
         new_entry->connection_id = current_cid+1;
         new_entry->file_desc = file_desc;
-        new_entry->host_name = malloc(256);
-        strcpy(new_entry->host_name,host_name);
-        new_entry->ip_addr = malloc(256);
-        strcpy(new_entry->ip_addr,ip_addr);
+        // new_entry->host_name = calloc(256, sizeof(char));
+        new_entry->host_name = strdup(host_name);
+        // new_entry->ip_addr = calloc(256, sizeof(char));
+        new_entry->ip_addr = strdup(ip_addr);
         new_entry->cl_next = *theList;
         *theList = new_entry;
     }
@@ -66,7 +67,11 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
 
 /******* Remove an entry from client list *********/
 int remove_from_client_list(client_list **theList, int file_desc){
-    
+    if (*theList==NULL )
+    {
+        fprintf(stderr, "All connections closed \n");
+        return;
+    }
     int i = 0;
     client_list * current = *theList;
     client_list * temp_node = NULL;
@@ -99,7 +104,6 @@ int pop(client_list ** theList) {
     next_node = (*theList)->cl_next;
     free(*theList);
     *theList = next_node;
-    printClientList(*theList);
     return retval;
 }
 
@@ -115,13 +119,12 @@ void add_port_to_client(client_list *theList, int file_desc ,char *port_num)
     while(loopList!=NULL){
         if (loopList->file_desc == file_desc)
         {
-            loopList->port = (char *)malloc(6);
-            strcpy(loopList->port,port_num);
+            // loopList->port = (char *)calloc(6, sizeof(char));
+            loopList->port = strdup(port_num);
             break;
         }
 
     }
-    printClientList(theList);
 }
 
 
@@ -133,8 +136,13 @@ void printClientList(client_list *theList)
     if (print_list == NULL)
     {
         printf("\nEmpty list\n");
+        return;
     }
     printf("\n");
+    printf("                            Available peers                              \n");
+    printf("-------------------------------------------------------------------------\n");
+    printf("%-5s%-35s%-20s%-8s\n","C Id","Host name","IP Address","Port");
+    printf("-------------------------------------------------------------------------\n");
     for (; print_list!= NULL; print_list = print_list->cl_next)
     {
         printf("%-5d%-35s%-20s%-8s\n",print_list->connection_id,

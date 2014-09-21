@@ -8,6 +8,6 @@ September 8th, 2014
 #define PA1_UI_H_ 
 
 void startApp(RUNNING_MODE runningMode, char *port);
-void exitOrHoldCursor(RUNNING_MODE runningMode, int listening_socket);
+void exitOrHoldCursor(RUNNING_MODE runningMode, int listening_socket, client_list *theList);
 
 #endif
