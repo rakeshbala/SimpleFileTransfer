@@ -6,6 +6,7 @@ September 9th, 2014
 
 #include "global.h"
 #include "pa1_command_handler.h"
+#include "pa1_client_register.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,6 +128,7 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
             break;
         }
         commandMyip();
+        printf("IP address:%s", my_ip_addr );
         break;
     }
     /******* Handle MYPORT *********/
@@ -155,10 +157,26 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
             break;
         }
 
-        commandRegister(argv[1],argv[2],theList);
+        command_connect(argv[1],argv[2],theList,REGISTER_FL);
         break;
     }
 
+    case 5:
+    {
+        if (runningMode == kSERVER_MODE)
+        {
+            fprintf(stderr, "Command available only in client\n");
+            break;
+        }
+        else if(argc!=3)
+        {
+            fprintf(stderr, "Wrong usage\n Usage: CONNECT <SERVER> <PORT>");
+            break;
+        }
+
+        command_connect(argv[1],argv[2],theList,CONNECT_FL);
+        break;
+    }
 
     /******* Handle EXIT *********/
     case 8:
@@ -196,20 +214,20 @@ void commandHelp(RUNNING_MODE runningMode,char * command)
         "CREATOR - Prints Author information",
         "HELP - Prints help information",
         "MYIP - Display the IP address of this process",
-        "MYPORT - DDisplay the port on which this process \
-            is listening for incoming connections.",
+        "MYPORT - Display the port on which this process \
+is listening for incoming connections.",
         "REGISTER - Registers the client with the server.\
             \n  Usage: REGISTER <SERVER IP> <PORT NO>",
         "CONNECT - Connects to a peer.\nUsage: CONNECT <DE\
-            STINATION> <PORT NO>",
+STINATION> <PORT NO>",
         "LIST - Display all connections",
         "TERMINATE - Terminate a connection using the connection id\
             \n  <Usage: TERMINATE <CONNECTION ID>",
         "EXIT - Close all connections and exit the process",
         "UPLOAD - Uploads a file to a peer.\n  Usage: UPLOAD \
-            <CONNECTION ID> <FILE NAME>",
+<CONNECTION ID> <FILE NAME>",
         "DOWNLOAD - Downloads a file from a peer.\n  Usage: DOWNLOAD \
-            <CONNECTION ID1> <FILE NAME1> <CONNECTION ID2> <FILE NAME2> ..",
+<CONNECTION ID1> <FILE NAME1> <CONNECTION ID2> <FILE NAME2> ..",
         "STATISTICS - Display statistics",
         "CLEAR - Clear the screen"
     };
@@ -277,7 +295,7 @@ void commandMyip()
             addr = &(ipv4->sin_addr);
             char ipstr[INET6_ADDRSTRLEN];
             inet_ntop(ip_family,addr,ipstr,sizeof ipstr);
-            printf("IP address:%s", ipstr);
+            my_ip_addr = strdup(ipstr);
             break;
         }
     }

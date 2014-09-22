@@ -55,8 +55,12 @@ typedef struct theList
 
 } client_list;
 
+
+extern  client_list *sip_list;
+
 extern const char *gbl_commandArray[];
 extern char * listening_port;
+extern char * my_ip_addr;
 extern fd_set master;
 extern int fd_max;
 #endif

@@ -63,7 +63,8 @@ int main(int argc, char **argv)
     /******* Start the application *********/
     char *port = argv[2];
     startApp(runningMode,port);
-
+    free(my_ip_addr);
+    free(listening_port);
     return 0;
 }
 

@@ -68,3 +68,12 @@ bool recv_all(int socket_fd, char *buffer,int buffer_len){
 	}	
 	return true;
 }
+
+int noOfDigits(int num){
+    int digits = 0;
+    while(num>0){
+        digits++;
+        num = num/10;
+    }
+    return digits;
+}

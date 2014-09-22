@@ -12,5 +12,6 @@ September 14th 2014
 void *get_in_addr(struct sockaddr *sa);
 bool send_all(int socket_fd, char *buffer, int buffer_len);
 bool recv_all(int socket_fd, char *buffer,int buffer_len);
+int noOfDigits(int num);
 
 #endif

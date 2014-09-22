@@ -92,7 +92,7 @@ void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket, client_list
             free (argv);
             if (status<0)
             {
-                if (runningMode = kSERVER_MODE)
+                if (runningMode == kSERVER_MODE)
                 {
                     close(listening_socket);
                 }

@@ -10,6 +10,7 @@ September 13th
 #include "pa1_cmd_validate.h"
 #include "pa1_network_util.h"
 #include "pa1_client_register.h"
+#include "pa1_client_connect.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -28,7 +29,7 @@ int fd_max; //tracking maximum fd_set
 
 /******* Function declarations *********/
 char * create_list_string(client_list *theList);
-void publish_list_to_client(char * ntw_string, int file_desc);
+void publish_list_to_client(client_list *theList, int file_desc);
 
 
 int listen_at_port(RUNNING_MODE runningMode, char * port)
@@ -165,14 +166,8 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         {
                             fd_max = new_fd;
                         }
-                        printf("\nNew connection from %s on %d...\n",
-                           inet_ntop(remoteaddr.ss_family,
-                             get_in_addr((struct sockaddr*)&remoteaddr),
-                             remoteIP, INET6_ADDRSTRLEN),
-                           new_fd);
 
                         //get host name
-
                         int name_status;
                         if (getnameinfo((struct sockaddr *)&remoteaddr,
                             sizeof remoteIP,
@@ -181,8 +176,16 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         {
                             fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
                         }
+
+                        inet_ntop(remoteaddr.ss_family,
+                            get_in_addr((struct sockaddr*)&remoteaddr),
+                             remoteIP, INET6_ADDRSTRLEN);
+
                         /******* Push it to the client list *********/
                         add_to_client_list(&theList, new_fd, host_name, remoteIP);
+
+                        // printf(PROMPT_NAME);
+                        // fflush(stdout);
 
                     }
                 }
@@ -197,32 +200,21 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         {
                             // connection closed
                             remove_from_client_list(&theList,ii);
+                            printClientList(theList);
+
                             if (runningMode == kSERVER_MODE)
                             {
-                                char *ntw_string = create_list_string(theList);
-
-                            /******* From Beej's network programming guide *********/
-                                int j;
-                                for (j = 0; j <= fd_max; ++j)
-                                {
-                                    if (FD_ISSET(j,&master))
-                                    {
-                                        if (j!=0 && j!=listening_socket)
-                                        {
-                                            publish_list_to_client(ntw_string,j);
-                                        }
-                                    }
-                                }
+                                publish_list_to_client(theList,listening_socket);
                             }
                             printf("\n");
-                            printf(PROMPT_NAME);
-                            fflush(stdout);
                             // printf("selectserver: socket %d hung up\n", ii);
                         }
                         else
                         {
                             perror("recv");
                         }
+                        printf(PROMPT_NAME);
+                        fflush(stdout);
                         close(ii); // bye!
                         FD_CLR(ii, &master); // remove from master set
                     }
@@ -240,54 +232,64 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         {
                             recv_all(ii,recv_buf,commandLen-nbytes);
                         }
-                        recv_buf[commandLen+1]='\0';
-                        free(recv_bufCopy);
+                        recv_buf[commandLen]='\0';
                         /******* All inputs received *********/
 
                         /******* Tokenize and process *********/
                         int argc = 0;
                         char **argv = (char **)calloc(3, sizeof(char *));
                         // printf("\nRaw : %s %d\n", recv_buf,nbytes);
-                        arg = strtok(recv_buf," ");
+                        char *endString;
+                        recv_bufCopy = strdup(recv_buf);
+                        arg = strtok_r(recv_bufCopy," ",&endString);
                         while(arg){
                             // argv[argc] = (char *)calloc(strlen(arg)+1, sizeof(char));
                             argv[argc] = strdup(arg);
+                            arg = strtok_r(NULL," ",&endString);
                             argc++;
-                            arg = strtok(NULL," ");
+                            if(argc>3){
+                                break;
+                            }
                         }
+                        free(recv_bufCopy);
 
-                        
+
 
                         /******* Handle the register command from client *********/
                         if (strcmp(argv[1],"register")==0)
                         {
-                            add_port_to_client(theList,ii,argv[2]);
-                            char *ntw_string = create_list_string(theList);
-
-                            /******* From Beej's network programming guide *********/
-                            int j;
-                            for (j = 0; j <= fd_max; ++j)
+                            if (runningMode==kCLIENT_MODE)
                             {
-                                if (FD_ISSET(j,&master))
-                                {
-                                    if (j!=0 && j!=listening_socket)
-                                    {
-                                        publish_list_to_client(ntw_string,j);
-                                    }
-                                }
+                                char *errorString = "21 error Not a server";
+                                send_all(ii,errorString,strlen(errorString));
+                                remove_from_client_list(&theList,ii);
                             }
+                            add_port_to_client(theList,ii,argv[2]);
+                            publish_list_to_client(theList,listening_socket);
                             printClientList(theList);
-                            // printf("\n");
-                            printf(PROMPT_NAME);
-                        }
-
-                        if (strcmp(argv[1],"server-ip-list")==0)
+                        }else if (strcmp(argv[1],"server-ip-list")==0)
                         {
                             parseAndPrintSIPList(argv[2]);
                             printf("\n");
-                            printf(PROMPT_NAME);
-                        }
+                        }else if(strcmp(argv[1],"connect")==0){
+                            // bool connectStatus = validate_connect(theList,ii,argv[2]);
+                            // if (connectStatus)
+                            // {
+                                add_port_to_client(theList,ii,argv[2]);
+                            // }
 
+                        }else if(strcmp(argv[1],"error")==0){
+                            /*************************************************
+                            From : http://stackoverflow.com/questions/7780809/
+                            is-it-possible-to-print-out-only-a-certain-section
+                            -of-a-c-string-without-making
+                            *************************************************/
+                            printf ("%s\n", &(recv_buf[9]));
+                        }
+                        else{
+                            fprintf(stderr, "Invalid data\n");
+                        }
+                        printf(PROMPT_NAME);
                         fflush(stdout);
                         int loopF;
                         for (loopF = 0; loopF < argc; ++loopF)
@@ -296,11 +298,11 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         }
                         free(argv);
                     }
-                } 
+                }
             }
         }
     }
-    freeLinkedList(theList);
+    freeLinkedList(&theList);
     return listening_socket;
 
 }
@@ -309,6 +311,10 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 
 char * create_list_string(client_list *theList)
 {
+    // if (theList==NULL)
+    // {
+
+    // }
     char *ntw_string = (char *)calloc(1024, sizeof(char));
     strcat(ntw_string,"server-ip-list ");
     client_list* loopList = theList;
@@ -322,15 +328,35 @@ char * create_list_string(client_list *theList)
         loopList = loopList->cl_next;
     }
     size_t length = strlen(ntw_string);
-    char *lengthStr=calloc(4, sizeof(char));
-    sprintf(lengthStr,"%zu",length+1);
-    char *newString = (char *)calloc(strlen(ntw_string)+strlen(lengthStr), sizeof(char));
-    sprintf(newString,"%s %s",lengthStr,ntw_string);
+    /******* Length edge case *********/
+    int num_digits_temp = noOfDigits((int)length);
+    int num_digits_add = noOfDigits((num_digits_temp+(int)length+1));
+    if (num_digits_temp != num_digits_add)
+    {
+        num_digits_add++;
+    }
+    int final_length = length+num_digits_add+1;
+    char *newString = (char *)calloc(final_length, sizeof(char));
+    sprintf(newString,"%d %s",final_length,ntw_string);
     free(ntw_string);
-    free(lengthStr);
     return newString;
 }
 
-void publish_list_to_client(char *ntw_string,int file_desc){
-    send_all(file_desc,ntw_string,strlen(ntw_string));
+
+void publish_list_to_client(client_list *theList, int listening_socket){
+
+    char *ntw_string = create_list_string(theList);
+
+    /******* From Beej's network programming guide *********/
+    int j;
+    for (j = 0; j <= fd_max; ++j)
+    {
+        if (FD_ISSET(j,&master))
+        {
+            if (j!=0 && j!=listening_socket)
+            {
+                send_all(j,ntw_string,strlen(ntw_string));
+            }
+        }
+    }
 }

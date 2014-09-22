@@ -11,6 +11,7 @@ September 14th 2014
 #include "pa1_cmd_validate.h"
 #include "pa1_ui.h"
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,15 +25,19 @@ September 14th 2014
 
 
 char * listening_port;
+int fd_max;
+fd_set master;
+client_list *sip_list;
+char * my_ip_addr;
 
-void commandRegister(char * destination, char *portStr, client_list *theList)
+void command_connect(char * destination, char *portStr, client_list *theList, connect_flag fl)
 {
 
     /******* Validate port *********/
     CMD_Validation_Status portStatus = checkPort(portStr);
     if (portStatus!=kSuccess)
     {
-        fprintf(stderr, "Invalid Port\n");  
+        fprintf(stderr, "Invalid Port\n");
         return;
     }
 
@@ -61,9 +66,9 @@ void commandRegister(char * destination, char *portStr, client_list *theList)
             struct sockaddr_in *dest_sock_addr = (struct sockaddr_in *)dest_addr_info->ai_addr;
             void * temp_addr = &(dest_sock_addr->sin_addr);
             inet_ntop(AF_INET, temp_addr, ipstr,sizeof ipstr);
-            printf("Testing");
-            printf("IP : %s , Port %d\n", ipstr, ntohs(dest_sock_addr->sin_port));
-            printf("Destination found\n");
+            // printf("Testing");
+            // printf("IP : %s , Port %d\n", ipstr, ntohs(dest_sock_addr->sin_port));
+            // printf("Destination found\n");
             break;
         }
     }
@@ -88,21 +93,26 @@ void commandRegister(char * destination, char *portStr, client_list *theList)
         fd_max = connect_socket;
     }
 
+
     char *commandStr = (char *)calloc(18, sizeof(char));
-    strcat(commandStr,"16 register ");
+    if (fl==REGISTER_FL)
+    {
+        strcat(commandStr,"17 register ");
+    }else if(fl==CONNECT_FL){
+        strcat(commandStr,"11 connect ");
+    }
     strcat(commandStr,listening_port);
     strcat(commandStr," ");
-    int numBytes = send(connect_socket,commandStr, strlen(commandStr),0);
+    int numBytes = send_all(connect_socket,commandStr,strlen(commandString));
+    // send(connect_socket,commandStr, strlen(commandStr),0);
     if (numBytes<0)
     {
-        perror("Sending port failed.");
+        perror("Send failed\n");
         return;
     }
-    printf("Connected to server...\n");
     free(commandStr);
 
-
-    //get server name
+    //get host name
     int name_status;
     char host_name [256];
     char service[20];
@@ -114,21 +124,18 @@ void commandRegister(char * destination, char *portStr, client_list *theList)
     {
         fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
     }
-
-
     add_to_client_list(&theList, connect_socket, host_name,ipstr);
     add_port_to_client(theList,connect_socket,portStr);
 }
 
-void parseAndPrintSIPList(char *SIPlist){
+void parseAndPrintSIPList(char *SIPlist_str){
 
-    printf("\n                            Available peers                              \n");
-    printf("-------------------------------------------------------------------------\n");
-    printf("%-35s%-20s%-8s\n","Host name","IP Address","Port");
-    printf("-------------------------------------------------------------------------\n");
+    // printf("Received string:\n %s\n", SIPlist_str);
     char *container;
     char *strTokInt;
-    container = strtok_r(SIPlist,";",&strTokInt);
+    container = strtok_r(SIPlist_str,";",&strTokInt);
+    int dummyFd=2;
+    freeLinkedList(&sip_list);
 
     while (container)
     {
@@ -137,6 +144,7 @@ void parseAndPrintSIPList(char *SIPlist){
         char **tokenArray = (char **)calloc(3, sizeof(char *));
         char * container2;
         char * strTokInt2;
+
         container2 = strtok_r(container,",",&strTokInt2);
         while (container2)
         {
@@ -145,7 +153,15 @@ void parseAndPrintSIPList(char *SIPlist){
             argc++;
             container2 = strtok_r(NULL,",",&strTokInt2);
         }
-        printf("%-35s%-20s%-8s\n",tokenArray[0],tokenArray[1],tokenArray[2]);
+
+        commandMyip();
+        if (!(strcmp(tokenArray[1],my_ip_addr)==0 && strcmp(tokenArray[2],listening_port)==0))
+        {
+            add_to_client_list(&sip_list,dummyFd,tokenArray[0],tokenArray[1]);
+            add_port_to_client(sip_list,dummyFd,tokenArray[2]);
+            dummyFd++;
+        }
+
         int i;
         for (i = 0; i < argc; ++i)
         {
@@ -153,6 +169,7 @@ void parseAndPrintSIPList(char *SIPlist){
         }
         free(tokenArray);
         container = strtok_r(NULL,";",&strTokInt);
-
     }
+    printClientList(sip_list);
 }
+
