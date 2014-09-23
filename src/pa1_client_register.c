@@ -70,6 +70,7 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
     if ((status = getaddrinfo(destination, portStr, &hints, &res)) != 0)
     {
         fprintf(stderr, "getaddrinfo : %s\n", gai_strerror(status));
+        freeaddrinfo(res);
         return ;
     }
 
@@ -84,7 +85,6 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
             break;
         }
     }
-    freeaddrinfo(res);
 
     /******* Get sockaddr of destination - End *********/
 
@@ -96,6 +96,7 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
     if(connect(connect_socket, dest_addr_info->ai_addr,dest_addr_info->ai_addrlen)<0)
     {
         perror("connect");
+        freeaddrinfo(res);
         return;
     }
 
@@ -114,7 +115,7 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
     }
     int digits = noOfDigits(strtol(listening_port,NULL,10));
     int totalLength = 2+1+strlen(commandString)+1+digits+1;
-    char *commandStr = (char *)calloc(totalLength, sizeof(char));
+    char *commandStr = (char *)calloc(totalLength+1, sizeof(char));
     sprintf(commandStr,"%d %s %s ",totalLength, commandString,listening_port);
 
     send_all(connect_socket,commandStr,strlen(commandStr));
@@ -128,12 +129,15 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
                         dest_addr_info->ai_addrlen,
                         host_name,
                         sizeof host_name,service,
-                        sizeof service,0 )<0)
+                        sizeof service,NI_NAMEREQD )<0)
     {
         fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
     }
     add_to_client_list(theList, connect_socket, host_name,ipstr);
     add_port_to_client(*theList, connect_socket, portStr);
+
+    freeaddrinfo(res);
+
 }
 
 void parseAndPrintSIPList(char *SIPlist_str){

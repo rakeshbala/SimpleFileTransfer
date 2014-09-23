@@ -65,6 +65,7 @@ int main(int argc, char **argv)
     startApp(runningMode,port);
     free(my_ip_addr);
     free(listening_port);
+    freeLinkedList(sip_list);
     return 0;
 }
 

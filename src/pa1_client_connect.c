@@ -104,7 +104,7 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
         	{
         		if (strcmp(loopList->port,port)==0)
         		{
-        			alreadyExistFlag = 1;
+        			alreadyExistFlag = true;
         			break;
         		}
         	}
@@ -158,7 +158,7 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
     	send_all(file_desc,"50 error Destination already connected to 3 peers ",50);
     	client_list *current;
     	get_list_entry(theList,&current,file_desc);
-    	fprintf(stderr, "%s (%s) already connected. Duplicate connection declined.\n",
+    	fprintf(stderr, "%s (%s) Maximum connections reached. New connection declined.\n",
     		current->host_name,current->ip_addr);
     	return false;
     }

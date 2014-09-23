@@ -107,6 +107,8 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
     if (working_ai == NULL)
     {
         fprintf(stderr, "Failed to bind\n");
+        freeaddrinfo(receive_ai);
+
         exit(EXIT_FAILURE);
     }
 
