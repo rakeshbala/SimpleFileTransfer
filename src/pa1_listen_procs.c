@@ -3,7 +3,8 @@ Rakesh Balasubramanian
 
 September 13th
 *************************************************/
-#define POSIX_C_SOURCE 200809L
+
+#define _GNU_SOURCE
 
 #include "global.h"
 #include "pa1_listen_procs.h"
