@@ -23,7 +23,6 @@ September 13th
 
 char * listening_port;
 
-
 fd_set master; //master file desc set
 int fd_max; //tracking maximum fd_set
 
@@ -134,6 +133,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
     {
 
         read_fds = master; //going to select();
+        fflush(stdout);
         if (select(fd_max+1, &read_fds, NULL, NULL, NULL) == -1)
         {
             perror("select");
@@ -146,7 +146,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                 /******* Take input from command line *********/
                 if(ii == 0)
                 {
-                    exitOrHoldCursor(runningMode,listening_socket,theList);
+                    exitOrHoldCursor(runningMode,listening_socket,&theList);
                 }
                 /******* Check for incoming connections *********/
                 else if (ii == listening_socket)
@@ -184,8 +184,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         /******* Push it to the client list *********/
                         add_to_client_list(&theList, new_fd, host_name, remoteIP);
 
-                        // printf(PROMPT_NAME);
-                        // fflush(stdout);
+
 
                     }
                 }
@@ -196,35 +195,29 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                     if ((nbytes = recv(ii, recv_buf, sizeof recv_buf, 0)) <= 0)
                     {
                         // got error or connection closed by client
-                        if (nbytes == 0)
-                        {
-                            // connection closed
-                            remove_from_client_list(&theList,ii);
-                            printClientList(theList);
-
-                            if (runningMode == kSERVER_MODE)
-                            {
-                                publish_list_to_client(theList,listening_socket);
-                            }
-                            printf("\n");
-                            // printf("selectserver: socket %d hung up\n", ii);
-                        }
-                        else
+                        if (nbytes < 0)
                         {
                             perror("recv");
                         }
-                        printf(PROMPT_NAME);
-                        fflush(stdout);
-                        close(ii); // bye!
+                        // connection closed
+                        remove_from_client_list(&theList,ii);
+                        printClientList(theList); //print on self
+                        close(ii); // bye! //Probably redundant
                         FD_CLR(ii, &master); // remove from master set
+
+                        if (runningMode == kSERVER_MODE)
+                        {
+                            publish_list_to_client(theList,listening_socket);
+                        }
+                        printf(PROMPT_NAME); //print the prompt
+
                     }
                     else
                     {
-                        /******* Data received *********/
 
                         /******* Make sure all input is received *********/
                         char *arg; //var for storing tokenized input
-                        char *recv_bufCopy;// = calloc(256, sizeof(char)); // needed since strtok modifies string
+                        char *recv_bufCopy; // needed since strtok modifies string
                         recv_bufCopy = strdup(recv_buf);
                         arg = strtok(recv_bufCopy," ");
                         int commandLen = strtol(arg,NULL,10);
@@ -237,7 +230,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 
                         /******* Tokenize and process *********/
                         int argc = 0;
-                        char **argv = (char **)calloc(3, sizeof(char *));
+                        char **argv = (char **)calloc(50, sizeof(char *));
                         // printf("\nRaw : %s %d\n", recv_buf,nbytes);
                         char *endString;
                         recv_bufCopy = strdup(recv_buf);
@@ -247,50 +240,62 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             argv[argc] = strdup(arg);
                             arg = strtok_r(NULL," ",&endString);
                             argc++;
-                            if(argc>3){
-                                break;
-                            }
                         }
                         free(recv_bufCopy);
 
 
 
                         /******* Handle the register command from client *********/
+                        // if (argc==0)
+                        // {
+                        //     continue;
+                        // }
+                        // printf("Received %s\n", recv_buf);
                         if (strcmp(argv[1],"register")==0)
                         {
                             if (runningMode==kCLIENT_MODE)
                             {
-                                char *errorString = "21 error Not a server";
+                                char *errorString = "22 error Not a server ";
                                 send_all(ii,errorString,strlen(errorString));
                                 remove_from_client_list(&theList,ii);
                             }
                             add_port_to_client(theList,ii,argv[2]);
                             publish_list_to_client(theList,listening_socket);
                             printClientList(theList);
+                            printf(PROMPT_NAME);
+                            fflush(stdout);
                         }else if (strcmp(argv[1],"server-ip-list")==0)
                         {
                             parseAndPrintSIPList(argv[2]);
                             printf("\n");
+                            printf(PROMPT_NAME);
+                            fflush(stdout);
                         }else if(strcmp(argv[1],"connect")==0){
-                            // bool connectStatus = validate_connect(theList,ii,argv[2]);
-                            // if (connectStatus)
-                            // {
+                            bool connectStatus = validate_connect(theList,ii,argv[2]);
+                            if (connectStatus)
+                            {
                                 add_port_to_client(theList,ii,argv[2]);
-                            // }
+                            }else{
+                                remove_from_client_list(&theList,ii);
+                            }
+                            printf(PROMPT_NAME);
+                            fflush(stdout);
 
                         }else if(strcmp(argv[1],"error")==0){
-                            /*************************************************
-                            From : http://stackoverflow.com/questions/7780809/
-                            is-it-possible-to-print-out-only-a-certain-section
-                            -of-a-c-string-without-making
-                            *************************************************/
-                            printf ("%s\n", &(recv_buf[9]));
+                            size_t length = (size_t)(strlen(recv_buf)-9);
+                            char *errorString= strndup(recv_buf+9,length);
+                            printf ("\nError: %s\n", errorString);
+                            free(errorString);
+                            printf(PROMPT_NAME);
+                            fflush(stdout);
+                        }else{
+                            fprintf(stderr, "%s Invalid data\n",argv[1]);
+                            printf(PROMPT_NAME);
+                            fflush(stdout);
                         }
-                        else{
-                            fprintf(stderr, "Invalid data\n");
-                        }
-                        printf(PROMPT_NAME);
-                        fflush(stdout);
+                        // printf("\n");
+                        // printf(PROMPT_NAME);
+                        // fflush(stdout);
                         int loopF;
                         for (loopF = 0; loopF < argc; ++loopF)
                         {
@@ -311,20 +316,16 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 
 char * create_list_string(client_list *theList)
 {
-    // if (theList==NULL)
-    // {
-
-    // }
     char *ntw_string = (char *)calloc(1024, sizeof(char));
     strcat(ntw_string,"server-ip-list ");
     client_list* loopList = theList;
     while(loopList!=NULL){
-        strcat(ntw_string,loopList->host_name);
-        strcat(ntw_string,",");
-        strcat(ntw_string,loopList->ip_addr);
-        strcat(ntw_string,",");
-        strcat(ntw_string,loopList->port);
-        strcat(ntw_string,";"); //entry separator
+        sprintf(ntw_string,"%s%s,%s,%s,%d;",
+            ntw_string,
+            loopList->host_name,
+            loopList->ip_addr,
+            loopList->port,
+            loopList->connection_id);
         loopList = loopList->cl_next;
     }
     size_t length = strlen(ntw_string);
@@ -338,6 +339,7 @@ char * create_list_string(client_list *theList)
     int final_length = length+num_digits_add+1;
     char *newString = (char *)calloc(final_length, sizeof(char));
     sprintf(newString,"%d %s",final_length,ntw_string);
+    printf("%s\n", ntw_string);
     free(ntw_string);
     return newString;
 }

@@ -59,10 +59,8 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
     /******* Dont print when adding to sip_list *********/
     if (!(*theList == sip_list))
     {
-        printf("\n%s (%s) trying to connect...\n",host_name,ip_addr);
+        printf("\n%s (%s): Trying to connect (fd %d)...\n",host_name,ip_addr,file_desc);
     }
-
-    // printClientList(*theList); //Remove this line later
 }
 
 
@@ -71,20 +69,30 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
 int remove_from_client_list(client_list **theList, int file_desc){
     if (*theList==NULL )
     {
-        fprintf(stderr, "All connections closed \n");
+        fprintf(stderr, "\nAll connections closed \n");
         return;
     }
+    close(file_desc);
+    FD_CLR(file_desc,&master);
+
     int i = 0;
     client_list * current = *theList;
     client_list * temp_node = NULL;
 
-    if (!(*theList == sip_list))
+    if (!(current == sip_list))
     {
-        printf("\nClient  %s (%s) disconnected...\n",current->host_name,current->ip_addr);
+        printf("\nClient  %s (%s) disconnected (fd %d)...\n",
+            current->host_name,current->ip_addr,file_desc);
     }
 
-    if ((*theList)->file_desc == file_desc) {
-        return pop(theList);
+    if (current->file_desc == file_desc) {
+        client_list * next_node = NULL;
+        next_node = current->cl_next;
+        current->cl_next=NULL;
+        freeLinkedList(&current);
+        current = next_node;
+        *theList=current;
+        return;
     }
 
     while (current->cl_next->file_desc != file_desc) {
@@ -93,23 +101,16 @@ int remove_from_client_list(client_list **theList, int file_desc){
         }
         current = current->cl_next;
     }
-    close(file_desc);
     temp_node = current->cl_next;
-    current->cl_next = temp_node->cl_next;
-    free(temp_node);
+    (*theList)->cl_next = temp_node->cl_next;
+    temp_node->cl_next=NULL;
+    freeLinkedList(&temp_node);
+    temp_node = NULL;
 }
 
-int pop(client_list ** theList) {
+int pop(client_list ** theList,int file_desc) {
     int retval = -1;
-    client_list * next_node = NULL;
-
-    if (*theList == NULL) {
-        return -1;
-    }
-
-    next_node = (*theList)->cl_next;
-    free(*theList);
-    *theList = next_node;
+    
     return retval;
 }
 
@@ -129,10 +130,11 @@ void add_port_to_client(client_list *theList, int file_desc ,char *port_num)
             loopList->port = strdup(port_num);
             if (!(loopList==sip_list))
             {
-                printf("%s (%s) connected on %s...\n",                
+                printf("%s (%s): Connected on %s (fd: %d)...\n",                
                         loopList->host_name,
                         loopList->ip_addr,
-                    port_num);
+                        port_num,
+                        file_desc);
             }
             return;
         }
@@ -145,44 +147,61 @@ void add_port_to_client(client_list *theList, int file_desc ,char *port_num)
 }
 
 
+void change_connect_id(client_list **theList, int file_desc ,int cid)
+{
+
+    client_list *loopList = *theList;
+    while(loopList!=NULL){
+        if (loopList->file_desc == file_desc)
+        {
+            loopList->connection_id = cid;
+            return;
+        }
+        loopList= loopList->cl_next;
+    }
+}
+
+
+
+bool get_list_entry(client_list *theList,client_list **theEntry, int file_desc){
+    *theEntry = theList;
+    while(theEntry!=NULL){
+        if ((*theEntry)->file_desc == file_desc)
+        {
+            return true;
+        }
+
+        (*theEntry)= (*theEntry)->cl_next;
+    }
+    return false;
+}
+
+
 /******* Print a client list *********/
-void printClientList(client_list *theList)
+bool printClientList(client_list *theList)
 {
     client_list *print_list;
     print_list = theList;
     if (print_list == NULL)
     {
-        printf("\nNo clients registered\n");
-        return;
+        return false;
     }
     printf("\n");
-    printf("                            Available peers                              \n");
+    printf("                            Available peers\n");
     printf("-------------------------------------------------------------------------\n");
-    if (theList==sip_list)
-    {
-        printf("%-35s%-20s%-8s\n","Host name","IP Address","Port");
-    }else{
-        printf("%-5s%-35s%-20s%-8s\n","CID","Host name","IP Address","Port");
-    }
+    printf("%-5s%-35s%-20s%-8s\n","CID","Host name","IP Address","Port");
     printf("-------------------------------------------------------------------------\n");
     for (; print_list!= NULL; print_list = print_list->cl_next)
     {
-        if (theList==sip_list)
-        {
-            printf("%-35s%-20s%-8s\n",
-                print_list->host_name,
-                print_list->ip_addr,
-                print_list->port);
-        }else{
-            printf("%-5d%-35s%-20s%-8s\n",
-                print_list->connection_id,
-                print_list->host_name,
-                print_list->ip_addr,
-                print_list->port);
-        }
 
+        printf("%-5d%-35s%-20s%-8s\n",
+            print_list->connection_id,
+            print_list->host_name,
+            print_list->ip_addr,
+            print_list->port);
     }
     printf("\n");
+    return true;
 }
 
 /******* Free a linked list *********/
@@ -192,11 +211,16 @@ void freeLinkedList(client_list **theList){
         tempNode = *theList;
         *theList=(*theList)->cl_next;
         free(tempNode->ip_addr);
+        tempNode->ip_addr=NULL;
         free(tempNode->host_name);
+        tempNode->host_name = NULL;
         free(tempNode->port);
+        tempNode->port = NULL;
         free(tempNode);
+        tempNode = NULL;
     }
-    (*theList) = NULL;
+    *theList = NULL;
+   // theList = NULL;
 }
 
 

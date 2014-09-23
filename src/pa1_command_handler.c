@@ -7,6 +7,7 @@ September 9th, 2014
 #include "global.h"
 #include "pa1_command_handler.h"
 #include "pa1_client_register.h"
+#include "pa1_command_handler.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,7 +34,7 @@ char * listening_port;
 /******* Function declarations *********/
 bool checkIfCommand(char *commandString,int *commandIndex);
 int commandDispatch(int argc, char **argv, int commandIndex,
-                    RUNNING_MODE runningMode, client_list *theList);
+                    RUNNING_MODE runningMode, client_list **theList);
 
 void commandHelp(RUNNING_MODE runningMode, char *command);
 void commandMyip();
@@ -42,7 +43,7 @@ void commandMyport();
 
 
 
-int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode, client_list *theList)
+int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode, client_list **theList)
 {
 
     /******* Check if valid command and get command index *********/
@@ -84,7 +85,7 @@ bool checkIfCommand(char *commandString,int *index)
 
 
 int commandDispatch(int argc, char **argv, int commandIndex,
-                    RUNNING_MODE runningMode, client_list *theList)
+                    RUNNING_MODE runningMode, client_list **theList)
 {
     switch (commandIndex)
     {
@@ -175,6 +176,18 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
         }
 
         command_connect(argv[1],argv[2],theList,CONNECT_FL);
+        break;
+    }
+
+    /******* Handle List *********/
+    case 6:
+    {
+        if (argc>1)
+        {
+            fprintf(stderr, "Too many arguments");
+            break;
+        }
+        commandList(*theList);
         break;
     }
 

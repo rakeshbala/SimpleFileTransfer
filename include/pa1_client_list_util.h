@@ -10,9 +10,10 @@ September 19th 2014
 
 void add_to_client_list(client_list ** theList,int file_desc,char *host_name, char *ip_addr);
 int remove_from_client_list(client_list **theList, int file_desc);
-void printClientList(client_list *theList);
+bool printClientList(client_list *theList);
 void freeLinkedList(client_list **theList);
-int pop(client_list **theList);
+int pop(client_list **theList,int file_desc);
 void add_port_to_client(client_list *theList, int file_desc ,char *port_num);
-
+bool get_list_entry(client_list *theList, client_list **theEntry,int file_desc);
+void change_connect_id(client_list **theList, int file_desc ,int cid);
 #endif

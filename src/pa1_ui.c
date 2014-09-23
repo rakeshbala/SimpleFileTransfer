@@ -30,7 +30,7 @@ void startApp(RUNNING_MODE runningMode, char * port)
     printf(ANSI_COLOR_GREEN "Starting application..." ANSI_COLOR_RESET);
     printf("\n");
     printf(PROMPT_NAME);
-    fflush(stdout);
+
 
     /******* If server, start listening *********/
     int server_socket = listen_at_port(runningMode,port);
@@ -43,7 +43,7 @@ void startApp(RUNNING_MODE runningMode, char * port)
 
 
 
-void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket, client_list *theList)
+void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket, client_list **theList)
 {
     /*************************************************
     Taken code snippet from :
@@ -101,7 +101,6 @@ void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket, client_list
             printf("\n");
         }
         printf(PROMPT_NAME);
-        fflush(stdout);
     }
     else
     {

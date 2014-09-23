@@ -30,8 +30,23 @@ fd_set master;
 client_list *sip_list;
 char * my_ip_addr;
 
-void command_connect(char * destination, char *portStr, client_list *theList, connect_flag fl)
+void command_connect(char * destination, char *portStr, client_list **theList, connect_flag fl)
 {
+
+    if (fl==CONNECT_FL)
+    {
+        client_list *countList = *theList;
+        int connectCount=0;
+        while(countList!=NULL){
+            connectCount++;
+            if (connectCount>3)
+            {
+                fprintf(stderr, "More than three connections.\n");
+                return;
+            }
+            countList=countList->cl_next;
+        }
+    }
 
     /******* Validate port *********/
     CMD_Validation_Status portStatus = checkPort(portStr);
@@ -66,9 +81,6 @@ void command_connect(char * destination, char *portStr, client_list *theList, co
             struct sockaddr_in *dest_sock_addr = (struct sockaddr_in *)dest_addr_info->ai_addr;
             void * temp_addr = &(dest_sock_addr->sin_addr);
             inet_ntop(AF_INET, temp_addr, ipstr,sizeof ipstr);
-            // printf("Testing");
-            // printf("IP : %s , Port %d\n", ipstr, ntohs(dest_sock_addr->sin_port));
-            // printf("Destination found\n");
             break;
         }
     }
@@ -93,23 +105,19 @@ void command_connect(char * destination, char *portStr, client_list *theList, co
         fd_max = connect_socket;
     }
 
-
-    char *commandStr = (char *)calloc(18, sizeof(char));
+    char *commandString;
     if (fl==REGISTER_FL)
     {
-        strcat(commandStr,"17 register ");
+        commandString = "register";
     }else if(fl==CONNECT_FL){
-        strcat(commandStr,"11 connect ");
+        commandString = "connect";
     }
-    strcat(commandStr,listening_port);
-    strcat(commandStr," ");
-    int numBytes = send_all(connect_socket,commandStr,strlen(commandString));
-    // send(connect_socket,commandStr, strlen(commandStr),0);
-    if (numBytes<0)
-    {
-        perror("Send failed\n");
-        return;
-    }
+    int digits = noOfDigits(strtol(listening_port,NULL,10));
+    int totalLength = 2+1+strlen(commandString)+1+digits+1;
+    char *commandStr = (char *)calloc(totalLength, sizeof(char));
+    sprintf(commandStr,"%d %s %s ",totalLength, commandString,listening_port);
+
+    send_all(connect_socket,commandStr,strlen(commandStr));
     free(commandStr);
 
     //get host name
@@ -124,13 +132,12 @@ void command_connect(char * destination, char *portStr, client_list *theList, co
     {
         fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
     }
-    add_to_client_list(&theList, connect_socket, host_name,ipstr);
-    add_port_to_client(theList,connect_socket,portStr);
+    add_to_client_list(theList, connect_socket, host_name,ipstr);
+    add_port_to_client(*theList, connect_socket, portStr);
 }
 
 void parseAndPrintSIPList(char *SIPlist_str){
 
-    // printf("Received string:\n %s\n", SIPlist_str);
     char *container;
     char *strTokInt;
     container = strtok_r(SIPlist_str,";",&strTokInt);
@@ -141,7 +148,7 @@ void parseAndPrintSIPList(char *SIPlist_str){
     {
 
         int argc=0;
-        char **tokenArray = (char **)calloc(3, sizeof(char *));
+        char **tokenArray = (char **)calloc(4, sizeof(char *));
         char * container2;
         char * strTokInt2;
 
@@ -154,13 +161,16 @@ void parseAndPrintSIPList(char *SIPlist_str){
             container2 = strtok_r(NULL,",",&strTokInt2);
         }
 
-        commandMyip();
-        if (!(strcmp(tokenArray[1],my_ip_addr)==0 && strcmp(tokenArray[2],listening_port)==0))
-        {
+        // commandMyip();
+        // if (!((strcmp(tokenArray[1],my_ip_addr)==0
+        //     || strcmp(tokenArray[1],"127.0.0.1")==0)
+        //     && strcmp(tokenArray[2],listening_port)==0))
+        // {
             add_to_client_list(&sip_list,dummyFd,tokenArray[0],tokenArray[1]);
             add_port_to_client(sip_list,dummyFd,tokenArray[2]);
+            change_connect_id(&sip_list,dummyFd,(int)strtol(tokenArray[3],NULL,10));
             dummyFd++;
-        }
+        // }
 
         int i;
         for (i = 0; i < argc; ++i)
@@ -170,6 +180,8 @@ void parseAndPrintSIPList(char *SIPlist_str){
         free(tokenArray);
         container = strtok_r(NULL,";",&strTokInt);
     }
-    printClientList(sip_list);
+    if(!printClientList(sip_list)){
+        printf("\nNo  other clients registered\n");
+    }
 }
 
