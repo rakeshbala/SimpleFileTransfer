@@ -187,7 +187,7 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
             fprintf(stderr, "Too many arguments");
             break;
         }
-        commandList(*theList);
+        commandList(*theList,runningMode);
         break;
     }
 

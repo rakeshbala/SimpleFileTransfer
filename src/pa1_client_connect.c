@@ -146,7 +146,7 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
         if (loopList->file_desc != file_desc) //Dont consider the last entry
         {
         	connectionCount++;
-        	if (connectionCount>0)
+        	if (connectionCount>3)
         	{
         		moreThanThree=true;
         	}

@@ -317,6 +317,12 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 char * create_list_string(client_list *theList)
 {
     char *ntw_string = (char *)calloc(1024, sizeof(char));
+    if (!ntw_string)
+    {
+        perror("calloc");
+        printf("Not able to initialize ntw_string\n");
+        return "";
+    }
     strcat(ntw_string,"server-ip-list ");
     client_list* loopList = theList;
     while(loopList!=NULL){
@@ -337,9 +343,15 @@ char * create_list_string(client_list *theList)
         num_digits_add++;
     }
     int final_length = length+num_digits_add+1;
-    char *newString = (char *)calloc(final_length, sizeof(char));
+    // printf("Final length: %d\n", final_length);
+    char *newString = (char *)calloc(final_length+1, sizeof(char));
+    if (!newString)
+    {
+        perror("calloc");
+        return "";
+    }
     sprintf(newString,"%d %s",final_length,ntw_string);
-    printf("%s\n", ntw_string);
+    // printf("Server ip list: %s\n",newString);
     free(ntw_string);
     return newString;
 }
@@ -361,4 +373,6 @@ void publish_list_to_client(client_list *theList, int listening_socket){
             }
         }
     }
+
+    free(ntw_string);
 }

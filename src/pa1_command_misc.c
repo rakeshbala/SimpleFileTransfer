@@ -10,8 +10,10 @@ September 22nd 2014
 #include <stdio.h>
 
 
+client_list* reverse(client_list* root);
 
-void commandList(client_list *theList){
+
+void commandList(client_list *theList,RUNNING_MODE runningMode){
 
 	if (theList==NULL)
 	{
@@ -23,24 +25,16 @@ void commandList(client_list *theList){
 	printf("%-5s%-35s%-20s%-8s\n","ID","Hostname","IP Address","Port No.");
     printf("-------------------------------------------------------------------------\n");
 
-	client_list *loopList = theList;
-	/******* Count the entries *********/
-	// client_list *countList = *theList;
-	// int connectCount=0;
-	// while(countList!=NULL){
-	// 	connectCount++;
-	// 	if (connectCount>3)
-	// 	{
-	// 		fprintf(stderr, "More than three connections.\n");
-	// 		return;
-	// 	}
-	// 	countList=countList->cl_next;
-	// }
+    client_list *loopList;
+    if (runningMode==kSERVER_MODE)
+    {
+    	loopList=reverse(theList);	
+    }else{
+    	loopList=theList;
+    }
+
+	 
 	while(loopList!=NULL){
-		// if (loopList->connection_id==argc)
-		// {
-		// 	/* code */
-		// }
 		int portNum = (int)strtol(loopList->port,NULL,10);
 		printf("%-5d%-35s%-20s%-8d\n",
 			loopList->connection_id,
@@ -52,3 +46,17 @@ void commandList(client_list *theList){
 
 }
 
+
+/*************************************************
+From: http://stackoverflow.com/questions/1801549/
+*************************************************/
+client_list* reverse(client_list* root) {
+  client_list* new_root = 0;
+  while (root) {
+    client_list* next = root->cl_next;
+    root->cl_next = new_root;
+    new_root = root;
+    root = next;
+  }
+  return new_root;
+}
