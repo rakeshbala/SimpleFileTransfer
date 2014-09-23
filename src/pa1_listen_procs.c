@@ -3,6 +3,7 @@ Rakesh Balasubramanian
 
 September 13th
 *************************************************/
+#define POSIX_C_SOURCE 200809L
 
 #include "global.h"
 #include "pa1_listen_procs.h"
@@ -174,9 +175,9 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         if (getnameinfo((struct sockaddr *)&remoteaddr,
                             sizeof remoteIP,
                             host_name,
-                            sizeof host_name,service,sizeof service,0)<0)
+                            sizeof host_name,service,sizeof service,NI_NAMEREQD)<0)
                         {
-                            fprintf(stderr, "Something wrong:%s\n", gai_strerror(name_status));
+                            fprintf(stderr, "Not able to find host name:%s\n", gai_strerror(name_status));
                         }
 
                         inet_ntop(remoteaddr.ss_family,
