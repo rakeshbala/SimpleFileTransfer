@@ -1,3 +1,5 @@
+#define POSIX_C_SOURCE 200809L
+#define _GNU_SOURCE
 #include <sys/types.h>
 
 #ifndef GLOBAL_H_

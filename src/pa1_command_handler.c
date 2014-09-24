@@ -179,7 +179,7 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
         break;
     }
 
-    /******* Handle List *********/
+    /******* Handle LIST *********/
     case 6:
     {
         if (argc>1)
@@ -188,6 +188,18 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
             break;
         }
         commandList(*theList,runningMode);
+        break;
+    }
+    /******* Handle TERMINATE *********/
+
+    case 7:
+    {
+        if (argc!=2)
+        {
+            fprintf(stderr, "Wrong usage\n Usage: TERMINATE <CONNNECTION ID>\n");
+            break;
+        }
+        commandTerminate(theList,strtol(argv[1],NULL,10));
         break;
     }
 

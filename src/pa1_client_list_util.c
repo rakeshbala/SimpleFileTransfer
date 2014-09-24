@@ -72,15 +72,15 @@ int remove_from_client_list(client_list **theList, int file_desc){
         fprintf(stderr, "\nAll connections closed \n");
         return;
     }
-    close(file_desc);
-    FD_CLR(file_desc,&master);
-
+    
     int i = 0;
     client_list * current = *theList;
     client_list * temp_node = NULL;
 
     if (!(current == sip_list))
     {
+        close(file_desc);
+        FD_CLR(file_desc,&master);
         printf("\nClient  %s (%s) disconnected (fd %d)...\n",
             current->host_name,current->ip_addr,file_desc);
     }

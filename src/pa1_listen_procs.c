@@ -205,12 +205,12 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         }
                         // connection closed
                         remove_from_client_list(&theList,ii);
-                        printClientList(theList); //print on self
                         close(ii); // bye! //Probably redundant
                         FD_CLR(ii, &master); // remove from master set
 
                         if (runningMode == kSERVER_MODE)
                         {
+                            printClientList(theList); //print on self
                             publish_list_to_client(theList,listening_socket);
                         }
                         printf(PROMPT_NAME); //print the prompt

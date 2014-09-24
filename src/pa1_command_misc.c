@@ -10,7 +10,6 @@ September 22nd 2014
 #include <stdio.h>
 
 
-client_list* reverse(client_list* root);
 
 
 void commandList(client_list *theList,RUNNING_MODE runningMode){
@@ -51,24 +50,17 @@ void commandList(client_list *theList,RUNNING_MODE runningMode){
 
 
 
-/*************************************************
-From: http://stackoverflow.com/questions/1801549/
-*************************************************/
-client_list* reverse(client_list* theList) {
-	client_list *curNode = theList, *nxtNode;
-	theList = NULL;
-
-    // Until no more in list, insert current before theList and advance.
-	while (curNode != NULL) {
-        // Need to save next node since we're changing the current.
-		nxtNode = curNode->cl_next;
-
-        // Insert at start of new list.
-		curNode->cl_next = theList;
-		theList = curNode;
-
-        // Advance to next.
-		curNode = nxtNode;
+void commandTerminate(client_list **theList, int connection_id)
+{
+	client_list *loopList = *theList;
+	while(loopList!=NULL){
+		if (loopList->connection_id == connection_id)
+		{
+			remove_from_client_list(theList,loopList->file_desc);
+			return;
+		}
 	}
-	return theList;
+
+	fprintf(stderr, "No connections exist for the given connection id\n");
+
 }
