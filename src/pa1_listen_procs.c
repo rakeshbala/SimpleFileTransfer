@@ -4,7 +4,7 @@ Rakesh Balasubramanian
 September 13th
 *************************************************/
 
-#define _GNU_SOURCE
+#define _GNU_SOURCE 1
 
 #include "global.h"
 #include "pa1_listen_procs.h"
