@@ -194,7 +194,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                 }
                 else// handle data from a client
                 {
-                    char recv_buf[256];  //256 bytes long recv_buffer
+                    char *recv_buf = (char *)calloc(256,sizeof(char));  //256 bytes long recv_buffer
                     int nbytes;
                     if ((nbytes = recv(ii, recv_buf, sizeof recv_buf, 0)) <= 0)
                     {
@@ -225,9 +225,10 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         recv_bufCopy = strdup(recv_buf);
                         arg = strtok(recv_bufCopy," ");
                         int commandLen = strtol(arg,NULL,10);
+                        recv_buf = (char *)realloc(recv_buf,commandLen+1);
                         if (commandLen-nbytes>0)
                         {
-                            recv_all(ii,recv_buf,commandLen-nbytes);
+                            recv_all(ii,recv_buf,commandLen-nbytes,nbytes);
                         }
                         recv_buf[commandLen]='\0';
                         /******* All inputs received *********/
@@ -244,6 +245,11 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             argv[argc] = strdup(arg);
                             arg = strtok_r(NULL," ",&endString);
                             argc++;
+                            //break if parsing data string
+                            if (argc>10)
+                            {
+                                break;
+                            }
                         }
                         free(recv_bufCopy);
 
@@ -267,13 +273,13 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             publish_list_to_client(theList,listening_socket);
                             printClientList(theList);
                             printf(PROMPT_NAME);
-                            fflush(stdout);
+                            // fflush(stdout);
                         }else if (strcmp(argv[1],"server-ip-list")==0)
                         {
                             parseAndPrintSIPList(argv[2]);
                             printf("\n");
                             printf(PROMPT_NAME);
-                            fflush(stdout);
+                            // fflush(stdout);
                         }else if(strcmp(argv[1],"connect")==0){
                             bool connectStatus = validate_connect(theList,ii,argv[2]);
                             if (connectStatus)
@@ -283,7 +289,23 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                                 remove_from_client_list(&theList,ii);
                             }
                             printf(PROMPT_NAME);
-                            fflush(stdout);
+                            // fflush(stdout);
+
+                        }else if(strcmp(argv[1],"file")==0){
+
+                            int digitsLen = noOfDigits(strtol(argv[0],NULL,10));//Get no of digits of length
+                            /******* DigitsLen+space+'file'+space *********/
+                            printf("digitsLen :%d\n", digitsLen);
+                            int offset = digitsLen+1+4+1;
+                            // size_t length = (size_t)(strlen(recv_buf)-offset);
+                            // char *bytesToWrite= strndup(recv_buf+offset,length);
+                            int i;
+                            for(i=0; i<commandLen;i++){       
+                                printf("%c", recv_buf[i]);
+                            };
+                            // free(bytesToWrite);
+                            printf(PROMPT_NAME);
+                            // fflush(stdout);
 
                         }else if(strcmp(argv[1],"error")==0){
                             size_t length = (size_t)(strlen(recv_buf)-9);
@@ -291,15 +313,16 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             printf ("\nError: %s\n", errorString);
                             free(errorString);
                             printf(PROMPT_NAME);
-                            fflush(stdout);
+                            // fflush(stdout);
                         }else{
                             fprintf(stderr, "%s Invalid data\n",argv[1]);
                             printf(PROMPT_NAME);
-                            fflush(stdout);
+                            // fflush(stdout);
                         }
                         // printf("\n");
                         // printf(PROMPT_NAME);
                         // fflush(stdout);
+                        free(recv_buf);
                         int loopF;
                         for (loopF = 0; loopF < argc; ++loopF)
                         {

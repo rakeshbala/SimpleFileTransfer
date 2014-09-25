@@ -37,7 +37,6 @@ socket-recv-and-send-all-data
 *************************************************/
 bool send_all(int socket_fd, char *buffer,int buffer_len){
 
-	// printf("Sending %s\n length: %d", buffer,buffer_len);
 	char *ptr =  buffer;
 	while(buffer_len>0){
 		int bytesSent = send(socket_fd,ptr,buffer_len,0);
@@ -55,20 +54,29 @@ bool send_all(int socket_fd, char *buffer,int buffer_len){
 
 
 
-bool recv_all(int socket_fd, char *buffer,int buffer_len){
+bool recv_all(int socket_fd, char *buffer,int buffer_len, int nbytes){
 
-	char temp[buffer_len];
+	char *temp = (char *)calloc(buffer_len+1,sizeof(char));
+	if (!temp)
+	{
+		perror("calloc");
+		return false;
+	}
 	int tempLen= buffer_len;
+	int copyHead = nbytes;
 	while(tempLen>0){
 		int bytesRecv = recv(socket_fd,temp,tempLen,0);
 		if (bytesRecv<0)
 		{
 			perror("recv");
+			free(temp);
 			return false;
 		}
-		strcat(buffer,temp);
+		memcpy(buffer+copyHead,temp,bytesRecv);
+		copyHead += bytesRecv;
 		tempLen -= bytesRecv;
 	}
+	free(temp);
 	return true;
 }
 

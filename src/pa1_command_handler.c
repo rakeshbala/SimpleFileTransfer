@@ -120,7 +120,7 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
         commandHelp(runningMode,command);
         break;
     }
-    /******* dispatch MYIP  *********/
+    /******* Dispatch MYIP  *********/
     case 2:
     {
         if (argc>1)
@@ -144,7 +144,7 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
         break;
     }
 
-    /******* Handle REGISTER *********/
+    /******* Dispatch REGISTER *********/
     case 4:
     {
         if (runningMode == kSERVER_MODE)
@@ -179,7 +179,7 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
         break;
     }
 
-    /******* Handle LIST *********/
+    /******* Dispatch LIST *********/
     case 6:
     {
         if (argc>1)
@@ -190,7 +190,7 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
         commandList(*theList,runningMode);
         break;
     }
-    /******* Handle TERMINATE *********/
+    /******* Dispatch TERMINATE *********/
 
     case 7:
     {
@@ -199,11 +199,11 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
             fprintf(stderr, "Wrong usage\n Usage: TERMINATE <CONNNECTION ID>\n");
             break;
         }
-        commandTerminate(theList,strtol(argv[1],NULL,10));
+        commandTerminate(theList,runningMode,strtol(argv[1],NULL,10));
         break;
     }
 
-    /******* Handle EXIT *********/
+    /******* Dispatch EXIT *********/
     case 8:
     {
         if (argc>1)
@@ -211,7 +211,41 @@ policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f
             fprintf(stderr, "Too many arguments");
             break;
         }
+        commandExit(theList);
         return -1;
+    }
+    /******* Dispatch Upload *********/
+    case 9:
+    {
+        if (runningMode == kSERVER_MODE)
+        {
+            fprintf(stderr, "Command available only in client\n");
+            break;
+        }
+        if (argc>7)
+        {
+            fprintf(stderr, "Too many arguments\n");
+            break;
+        }
+        if (argc<3)
+        {
+            fprintf(stderr, "Too few arguments\n");
+            break;
+        }
+        if ((argc%2)==0)
+        {
+            fprintf(stderr, "Invalid parameter '%s' dropped\n", argv[argc-1]);
+            argc--;   
+        }
+
+        /******* Dispatch params accordingly *********/
+        int ll;
+        for (ll = 0; ll < argc/2; ll++)
+        {
+            int cid = strtol(argv[(ll*2)+1],NULL,10);
+            command_upload(*theList,cid, argv[(ll*2)+2]);
+        }
+        break;
     }
 
     /******* Handle CLEAR *********/

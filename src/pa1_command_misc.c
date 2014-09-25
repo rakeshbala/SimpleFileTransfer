@@ -50,8 +50,14 @@ void commandList(client_list *theList,RUNNING_MODE runningMode){
 
 
 
-void commandTerminate(client_list **theList, int connection_id)
+void commandTerminate(client_list **theList, RUNNING_MODE runningMode, int connection_id)
 {
+
+	if (runningMode=kCLIENT_MODE&& connection_id == 1)
+	{
+		fprintf(stderr, "Terminate of server from client not allowed\n");
+		return;
+	}
 	client_list *loopList = *theList;
 	while(loopList!=NULL){
 		if (loopList->connection_id == connection_id)
@@ -63,4 +69,15 @@ void commandTerminate(client_list **theList, int connection_id)
 
 	fprintf(stderr, "No connections exist for the given connection id\n");
 
+}
+
+
+void commandExit(client_list **theList){
+
+	client_list * loopList = *theList;
+	while(loopList!=NULL){
+		client_list *tempList = loopList;
+		loopList= loopList->cl_next;
+		remove_from_client_list(theList, tempList->file_desc);
+	}
 }

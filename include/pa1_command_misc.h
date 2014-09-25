@@ -10,6 +10,7 @@ September 22nd 2014
 #define PA1_COMMAND_MISC_H_ 
 
 void commandList(client_list * theList,RUNNING_MODE runningMode);
-void commandTerminate(client_list **theList, int connection_id);
+void commandTerminate(client_list **theList, RUNNING_MODE runningMode, int connection_id);
+void commandExit(client_list **theList);
 
 #endif
