@@ -1,0 +1,4 @@
+A simple file to test file read and file write.
+
+Last line.
+
