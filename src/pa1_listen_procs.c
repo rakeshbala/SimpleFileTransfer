@@ -13,6 +13,7 @@ September 13th
 #include "pa1_network_util.h"
 #include "pa1_client_register.h"
 #include "pa1_client_connect.h"
+#include "pa1_command_upload.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -292,20 +293,22 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             // fflush(stdout);
 
                         }else if(strcmp(argv[1],"file")==0){
-
-                            int digitsLen = noOfDigits(strtol(argv[0],NULL,10));//Get no of digits of length
-                            /******* DigitsLen+space+'file'+space *********/
-                            printf("digitsLen :%d\n", digitsLen);
-                            int offset = digitsLen+1+4+1;
-                            // size_t length = (size_t)(strlen(recv_buf)-offset);
-                            // char *bytesToWrite= strndup(recv_buf+offset,length);
-                            int i;
-                            for(i=0; i<commandLen;i++){       
-                                printf("%c", recv_buf[i]);
-                            };
-                            // free(bytesToWrite);
+                            int bufLength =strtol(argv[0],NULL,10);
+                            int digitsLen = noOfDigits(bufLength);//Get no of digits of length
+                            /******* DigitsLen+space+'file'+space+'fileName'+space *********/
+                            int offset = digitsLen+1+4+1+strlen(argv[2])+1;
+                            int writeLength = bufLength - offset;
+                            bool write_status = writeToFile(recv_buf+offset,argv[2],writeLength);
+                            if (write_status)
+                            {
+                               client_list *host;
+                               get_list_entry(theList, &host, ii);
+                               printf("\nFile %s from %s (%s:%s) written to disk\n",
+                                argv[2], host->host_name, 
+                                host->ip_addr, 
+                                host->port);     
+                            }                        
                             printf(PROMPT_NAME);
-                            // fflush(stdout);
 
                         }else if(strcmp(argv[1],"error")==0){
                             size_t length = (size_t)(strlen(recv_buf)-9);

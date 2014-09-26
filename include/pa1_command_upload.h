@@ -9,6 +9,7 @@ September 24th
 #define PA1_COMMAND_UPLOAD_H_ 
 
 void command_upload(client_list *theList, int connection_id, char *path);
+bool writeToFile(char *data, char *fileName, int writeLength);
 
 #endif
 

@@ -11,6 +11,7 @@ September 24th
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
 
 void command_upload(client_list *theList, int connection_id, char *path)
 {
@@ -29,7 +30,11 @@ void command_upload(client_list *theList, int connection_id, char *path)
 		}
 		destination=destination->cl_next;
 	}
-
+	if (destination==NULL)
+	{
+		fprintf(stderr, "No connection with id %d\n", connection_id);
+		return;
+	}
 	
 	FILE *fp;
 	if (fp = fopen(path, "rb"))
@@ -48,29 +53,55 @@ void command_upload(client_list *theList, int connection_id, char *path)
 		{
 			num_digits_add++;
 		}
-		//+size of string 'file'
-		int final_length = length+num_digits_add+1+4;
+		//+size of string = 'digits of size'+ ' '+'file'+' '+length
+		int final_length = length+num_digits_add+1+4+1;
+		char *filename = basename(path);
+		final_length = final_length + strlen(filename) + 1;
+
 
 		char *fileBytes = (char *)calloc(final_length,sizeof(char));
 		char *tempBuf = calloc(length,sizeof(char));
-		size_t len = fread(tempBuf, 1, length, fp);
 
+		size_t len = fread(tempBuf, 1, length, fp);
 		if (len<0)
 		{
 			perror("read");
 			free(fileBytes);
 			return;
 		}
-		sprintf(fileBytes,"%d file ",final_length);
-		memcpy(fileBytes+(final_length-length+1), tempBuf,length);
+
+
+		sprintf(fileBytes,"%d file %s ",final_length,filename);
+		memcpy(fileBytes+(final_length-length), tempBuf,length);
 		int i;
 		send_all(destination->file_desc,fileBytes,final_length);
 		free(fileBytes);
 		fclose(fp);
+		printf("File %s uploaded\n", filename);
 
 	}else{
 		perror("file open");
 	}
+}
+
+bool writeToFile(char *data,char *fileName,int writeLength)
+{
+	FILE *fp;
+	if (fp = fopen(fileName, "wb"))
+	{
+		int nbytes = fwrite(data,1,writeLength,fp);
+		if (nbytes<0)
+		{
+			perror("write");
+			fclose(fp);
+			return false;
+		}
+	}else{
+		perror("fopen");
+		return false;
+	}
+	fclose(fp);
+	return true;
 
 
 }

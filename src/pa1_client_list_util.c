@@ -130,7 +130,7 @@ void add_port_to_client(client_list *theList, int file_desc ,char *port_num)
             loopList->port = strdup(port_num);
             if (!(loopList==sip_list))
             {
-                printf("%s (%s): Connected on %s (fd: %d)...\n",                
+                printf("%s (%s : %s): Connected. (fd: %d)...\n",                
                         loopList->host_name,
                         loopList->ip_addr,
                         port_num,
