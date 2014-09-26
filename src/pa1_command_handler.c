@@ -98,10 +98,10 @@ int commandDispatch(int argc, char **argv, int commandIndex,
                 break;
             }
             printf("\nName	  : Rakesh Balasubramanian\nUBIT Name : rbalasub\n\
-                E-mail	  : rbalasub@buffalo.edu\n");
+E-mail	  : rbalasub@buffalo.edu\n");
             printf("I have read and understood the course academic integrity \
-                policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f14/\
-                index.html#integrity\n\n");
+policy located at\nhttp://www.cse.buffalo.edu/faculty/dimitrio/courses/cse4589_f14/\
+index.html#integrity\n\n");
             break;
         }
         /******* dispatch HELP *********/
@@ -298,19 +298,19 @@ void commandHelp(RUNNING_MODE runningMode,char * command)
         "HELP - Prints help information",
         "MYIP - Display the IP address of this process",
         "MYPORT - Display the port on which this process \
-        is listening for incoming connections.",
+is listening for incoming connections.",
         "REGISTER - Registers the client with the server.\
-        \n  Usage: REGISTER <SERVER IP> <PORT NO>",
+\n  Usage: REGISTER <SERVER IP> <PORT NO>",
         "CONNECT - Connects to a peer.\nUsage: CONNECT <DE\
-        STINATION> <PORT NO>",
+STINATION> <PORT NO>",
         "LIST - Display all connections",
         "TERMINATE - Terminate a connection using the connection id\
-        \n  <Usage: TERMINATE <CONNECTION ID>",
+\n  <Usage: TERMINATE <CONNECTION ID>",
         "EXIT - Close all connections and exit the process",
         "UPLOAD - Uploads a file to a peer.\n  Usage: UPLOAD \
-        <CONNECTION ID> <FILE NAME>",
+<CONNECTION ID> <FILE NAME>",
         "DOWNLOAD - Downloads a file from a peer.\n  Usage: DOWNLOAD \
-        <CONNECTION ID1> <FILE NAME1> <CONNECTION ID2> <FILE NAME2> ..",
+<CONNECTION ID1> <FILE NAME1> <CONNECTION ID2> <FILE NAME2> ..",
         "STATISTICS - Display statistics",
         "CLEAR - Clear the screen"
     };
