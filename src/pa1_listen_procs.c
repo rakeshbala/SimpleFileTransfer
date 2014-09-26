@@ -321,6 +321,12 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             }                        
                             printf(PROMPT_NAME);
 
+                        }else if(strcmp(argv[1],"download")==0){
+                            client_list *downloadEntry;
+                            get_list_entry(theList,&downloadEntry,ii);
+                            command_upload(theList,downloadEntry->connection_id,argv[2],kDOWN_FL);
+                            printf(PROMPT_NAME);
+
                         }else if(strcmp(argv[1],"error")==0){
                             size_t length = (size_t)(strlen(recv_buf)-9);
                             char *errorString= strndup(recv_buf+9,length);

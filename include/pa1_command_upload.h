@@ -8,7 +8,7 @@ September 24th
 #ifndef PA1_COMMAND_UPLOAD_H_
 #define PA1_COMMAND_UPLOAD_H_ 
 
-void command_upload(client_list *theList, int connection_id, char *path);
+void command_upload(client_list *theList, int connection_id, char *path, TRANSFER_TYPE transferType);
 bool writeToFile(char *data, char *fileName, int writeLength);
 
 #endif

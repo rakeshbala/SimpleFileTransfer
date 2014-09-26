@@ -38,6 +38,12 @@ typedef enum
 
 typedef enum
 {
+    kDOWN_FL,
+    kUP_FL
+} TRANSFER_TYPE;
+
+typedef enum
+{
     false,
     true
 } bool;

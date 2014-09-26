@@ -13,7 +13,7 @@ September 24th
 #include <string.h>
 #include <libgen.h>
 
-void command_upload(client_list *theList, int connection_id, char *path)
+void command_upload(client_list *theList, int connection_id, char *path, TRANSFER_TYPE transferType)
 {
 	
 	if (connection_id==1)
@@ -66,6 +66,10 @@ void command_upload(client_list *theList, int connection_id, char *path)
 		if (len<0)
 		{
 			perror("read");
+			if (transferType == kDOWN_FL)
+			{
+				send_all(destination->file_desc,"35 error Read error at destination ",35);
+			}
 			free(fileBytes);
 			return;
 		}
@@ -77,10 +81,23 @@ void command_upload(client_list *theList, int connection_id, char *path)
 		send_all(destination->file_desc,fileBytes,final_length);
 		free(fileBytes);
 		fclose(fp);
-		printf("File %s uploaded\n", filename);
+		if (transferType==kUP_FL)
+		{
+			printf("\nFile %s uploaded\n", filename);
+		}else{
+			printf("\nFile %s sent to %s (%s:%s) \n", 
+				filename,
+				destination->host_name,
+				destination->ip_addr,
+				destination->port);
+		}
 
 	}else{
 		perror("file open");
+		if (transferType == kDOWN_FL)
+		{
+			send_all(destination->file_desc,"28 error File doesn't exist ",28);
+		}
 	}
 }
 
