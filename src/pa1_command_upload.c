@@ -95,8 +95,13 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 	}else{
 		perror("file open");
 		if (transferType == kDOWN_FL)
-		{
-			send_all(destination->file_desc,"28 error File doesn't exist ",28);
+		{	
+			int pathLen = strlen(path);
+			int sendLength = pathLen+31;
+			char * sendString = (char *)calloc(sendLength+1,sizeof(char));
+			sprintf(sendString,"%d error File '%s' doesn't exist ",sendLength,path);
+			send_all(destination->file_desc,sendString,sendLength);
+			free(sendString);
 		}
 	}
 }

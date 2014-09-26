@@ -34,9 +34,10 @@ void command_download(client_list *theList, int connection_id, char * path)
 
 	int pathLen = strlen(path);
 	int sendLength = pathLen+13;
-	char * sendString = (char *)calloc(sendLength,sizeof(char));
+	char * sendString = (char *)calloc(sendLength+1,sizeof(char));
 	sprintf(sendString,"%d download %s ",sendLength,path);
 	send_all(destination->file_desc,sendString,sendLength);
+	free(sendString);
 
 	printf("Downloading file %s from %s (%s:%s) \n",
 			path, 
