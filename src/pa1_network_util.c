@@ -21,12 +21,11 @@ September 14th 2014
 /******* From Beej's network programming guide *********/
 void *get_in_addr(struct sockaddr *sa)
 {
-    if (sa->sa_family == AF_INET)
+    if (sa->sa_family == AF_INET6)
     {
-        return &(((struct sockaddr_in*)sa)->sin_addr);
+    	return &(((struct sockaddr_in6*)sa)->sin6_addr);        
     }
-
-    return &(((struct sockaddr_in6*)sa)->sin6_addr);
+    return &(((struct sockaddr_in*)sa)->sin_addr);
 }
 
 
