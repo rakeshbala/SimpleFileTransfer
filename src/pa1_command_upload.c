@@ -12,7 +12,7 @@ September 24th
 #include <stdlib.h>
 #include <string.h>
 #include <libgen.h>
-
+#include <sys/time.h>
 
 void command_upload(client_list *theList, int connection_id, char *path, TRANSFER_TYPE transferType)
 {
@@ -69,6 +69,11 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 
 		/******* Send file in chunks *********/
 		int sendChunkSize= 100;		//Determines the chunk size
+		
+		/******* Mark start time *********/
+		struct timeval tv_start;
+		int status = gettimeofday(&tv_start,NULL);
+
 		while(length>0){
 
 			/******* Read in chunks *********/
@@ -79,17 +84,29 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 				perror("read");
 				if (transferType == kDOWN_FL)
 				{
-					/******* Send each chunk *********/
 					send_all(destination->file_desc,"35 error Read error at destination ",35);
 				}
 				free(fileBytes);
 				return;
 			}
-			//This line sends the chunk
+			/******* Send each chunk *********/
 			send_all(destination->file_desc,fileBytes,len);
 			length = length-len;
 			free(fileBytes);
 		}
+
+		/******* Mark end time *********/
+		struct timeval tv_end;
+		status = gettimeofday(&tv_end,NULL);
+
+		/******* Calculate total time *********/
+		int diff_usec = (tv_end.tv_sec*1000+tv_end.tv_usec) - (tv_start.tv_sec*1000+tv_end.tv_usec);
+		off_t noOfBits = (final_length-metaLength)*8; //length is lost
+		float txRate = ((float)noOfBits)/diff_usec;
+
+		printf("Transfer rate %2f \n", txRate);
+
+
 
 		/******* Cleanup and print messages *********/
 		fclose(fp);
@@ -119,6 +136,8 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 	}
 }
 
+
+/******* Writing to file in one shot. Doesn't affect the network speed *********/
 bool writeToFile(char *data,char *fileName,int writeLength)
 {
 	FILE *fp;
