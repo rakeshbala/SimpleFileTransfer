@@ -192,7 +192,6 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             printf("IPv6 %s\n",remoteIP);
                             char *test = strndup (remoteIP+7,strlen(remoteIP)-7);
                             printf("IPv4 %s\n",test);
-                            free(test);
                         }else{
                             test = strdup(remoteIP);
                         }
