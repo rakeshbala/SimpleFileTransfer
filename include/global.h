@@ -57,6 +57,8 @@ typedef struct theList
     char * host_name;
     char * ip_addr;
     char * port;
+    int upload_count;
+    int download_count;
 
     struct theList * cl_next;
 

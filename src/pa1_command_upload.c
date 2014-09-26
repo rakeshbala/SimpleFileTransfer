@@ -16,7 +16,7 @@ September 24th
 
 void command_upload(client_list *theList, int connection_id, char *path, TRANSFER_TYPE transferType)
 {
-	
+
 	if (connection_id==1)
 	{
 		fprintf(stderr, "Upload/Download from server not allowed \n" );
@@ -27,7 +27,7 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 	while(destination!=NULL){
 		if (destination->connection_id == connection_id)
 		{
-			break;	
+			break;
 		}
 		destination=destination->cl_next;
 	}
@@ -36,16 +36,16 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		fprintf(stderr, "No connection with id %d\n", connection_id);
 		return;
 	}
-	
+
 	FILE *fp;
 	if (fp = fopen(path, "rb"))
-	{	
+	{
 
 		/*************************************************
 		http://stackoverflow.com/questions/238603/how-can-
 		i-get-a-files-size-in-c
 		*************************************************/
-		
+
 
 		off_t length = lseek(fileno(fp), 0, SEEK_END);
 		rewind(fp);
@@ -58,7 +58,7 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		}
 		char *filename = basename(path);
 		//+size of string = 'digits of size'+ ' '+'file'+' '+'filename'+' '
-		
+
 		/******* Send initial meta data *********/
 		int metaLength = num_digits_add+1+4+1+strlen(filename)+1;
 		int final_length = length+metaLength;
@@ -69,7 +69,7 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 
 		/******* Send file in chunks *********/
 		int sendChunkSize= 100;		//Determines the chunk size
-		
+
 		/******* Mark start time *********/
 		struct timeval tv_start;
 		int status = gettimeofday(&tv_start,NULL);
@@ -100,32 +100,31 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		status = gettimeofday(&tv_end,NULL);
 
 		/******* Calculate total time *********/
-		int diff_usec = (tv_end.tv_sec*1000+tv_end.tv_usec) - (tv_start.tv_sec*1000+tv_end.tv_usec);
-		off_t noOfBits = (final_length-metaLength)*8; //length is lost
-		float txRate = ((float)noOfBits)/diff_usec;
+		long diff_usec = (tv_end.tv_sec*(long)1000000.0+tv_end.tv_usec) -
+			(tv_start.tv_sec*(long)1000000.0+tv_start.tv_usec);
+		int noOfBits = (final_length-metaLength)*8; //length is lost
+		// printf("Start time micro %ld End time micro %ld\n", tv_start.tv_usec, tv_end.tv_usec );
+		// printf("Bits transferred %d\n", noOfBits);
+		// printf("Time difference %ld\n", diff_usec);
+		double txRate = (((float)noOfBits)/diff_usec)*1000000;
 
-		printf("Transfer rate %2f \n", txRate);
+		printf("Transfer rate %f b/s\n", txRate);
 
-
+		/******* Get my host name *********/
+		char my_host_name[50];
+		gethostname(my_host_name,50);
+		printf("%s -> %s, File size: %d Bytes, Time Taken: %f seconds, Tx Rate: %.2f bits/second\n",
+			my_host_name,destination->host_name,(final_length-metaLength),
+			diff_usec/1000000.0, txRate );
 
 		/******* Cleanup and print messages *********/
 		fclose(fp);
-		if (transferType==kUP_FL)
-		{
-			printf("\nFile %s uploaded\n", filename);
-		}else{
-			printf("\nFile %s sent to %s (%s:%s) \n", 
-				filename,
-				destination->host_name,
-				destination->ip_addr,
-				destination->port);
-		}
 		fflush(stdout);
 
 	}else{
 		perror("file open");
 		if (transferType == kDOWN_FL)
-		{	
+		{
 			int pathLen = strlen(path);
 			int sendLength = pathLen+31;
 			char * sendString = (char *)calloc(sendLength+1,sizeof(char));

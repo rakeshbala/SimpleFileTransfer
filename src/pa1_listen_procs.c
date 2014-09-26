@@ -23,6 +23,8 @@ September 13th
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/time.h>
+
 
 char * listening_port;
 
@@ -208,6 +210,8 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                 {
                     char *recv_buf = (char *)calloc(256,sizeof(char));  //256 bytes long recv_buffer
                     int nbytes;
+                    struct timeval tv_start;
+                    gettimeofday(&tv_start,NULL);
                     if ((nbytes = recv(ii, recv_buf, sizeof recv_buf, 0)) <= 0)
                     {
                         // got error or connection closed by client
@@ -312,12 +316,23 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             bool write_status = writeToFile(recv_buf+offset,argv[2],writeLength);
                             if (write_status)
                             {
-                               client_list *host;
-                               get_list_entry(theList, &host, ii);
-                               printf("\nFile %s from %s (%s:%s) written to disk\n",
-                                argv[2], host->host_name, 
-                                host->ip_addr, 
-                                host->port);     
+                                struct timeval tv_end;
+                                gettimeofday(&tv_end,NULL);
+
+                                /******* Get receive rate *********/
+                                long diff_usec = (tv_end.tv_sec*(long)1000000.0+tv_end.tv_usec) -
+                                (tv_start.tv_sec*(long)1000000.0+tv_start.tv_usec);
+                                int noOfBits = (writeLength)*8;
+                                double txRate = (((float)noOfBits)/diff_usec)*1000000.0;
+
+                                /******* Get my and destination host name *********/
+                                char my_host_name[50];
+                                gethostname(my_host_name,50);
+                                client_list *host;
+                                get_list_entry(theList, &host, ii);
+                                printf("%s -> %s, File size: %d Bytes, Time Taken: %f seconds, Rx Rate: %.2f bits/second\n",
+                                    host->host_name,my_host_name,writeLength,diff_usec/1000000.0, txRate );
+
                             }                        
                             printf(PROMPT_NAME);
 
