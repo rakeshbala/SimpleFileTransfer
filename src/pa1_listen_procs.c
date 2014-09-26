@@ -184,7 +184,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 
                         // struct 
 
-                        inet_ntop(AF_INET,
+                        inet_ntop(((struct sockaddr *)&remoteaddr)->sa_family,
                             get_in_addr((struct sockaddr*)&remoteaddr),
                              remoteIP, INET6_ADDRSTRLEN);
                         if (((struct sockaddr *)&remoteaddr)->sa_family==AF_INET6)
