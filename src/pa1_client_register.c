@@ -70,7 +70,6 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
     if ((status = getaddrinfo(destination, portStr, &hints, &res)) != 0)
     {
         fprintf(stderr, "getaddrinfo : %s\n", gai_strerror(status));
-        freeaddrinfo(res);
         return ;
     }
 
