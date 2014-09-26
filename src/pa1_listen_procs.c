@@ -182,7 +182,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             fprintf(stderr, "Not able to find host name:%s\n", gai_strerror(name_status));
                         }
 
-                        inet_ntop(remoteaddr.ss_family,
+                        inet_ntop(AF_INET,
                             get_in_addr((struct sockaddr*)&remoteaddr),
                              remoteIP, INET6_ADDRSTRLEN);
 
