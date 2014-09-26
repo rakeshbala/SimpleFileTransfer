@@ -182,9 +182,15 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             fprintf(stderr, "Not able to find host name:%s\n", gai_strerror(name_status));
                         }
 
+                        // struct 
+
                         inet_ntop(AF_INET,
                             get_in_addr((struct sockaddr*)&remoteaddr),
                              remoteIP, INET6_ADDRSTRLEN);
+                        if (((struct sockaddr *)&remoteaddr)->sa_family==AF_INET6)
+                        {
+                            printf("IPv6 %s\n",remoteIP);
+                        }
 
                         /******* Push it to the client list *********/
                         add_to_client_list(&theList, new_fd, host_name, remoteIP);
