@@ -13,6 +13,7 @@ September 24th
 #include <string.h>
 #include <libgen.h>
 
+
 void command_upload(client_list *theList, int connection_id, char *path, TRANSFER_TYPE transferType)
 {
 	
@@ -44,7 +45,9 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		http://stackoverflow.com/questions/238603/how-can-
 		i-get-a-files-size-in-c
 		*************************************************/
-		off_t length = lseek(fileno(fp), 0, SEEK_END)+1;
+		
+
+		off_t length = lseek(fileno(fp), 0, SEEK_END);
 		rewind(fp);
 		/******* String length edge case *********/
 		int num_digits_temp = noOfDigits((int)length);
@@ -53,33 +56,42 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		{
 			num_digits_add++;
 		}
-		//+size of string = 'digits of size'+ ' '+'file'+' '+length
-		int final_length = length+num_digits_add+1+4+1;
 		char *filename = basename(path);
-		final_length = final_length + strlen(filename) + 1;
+		//+size of string = 'digits of size'+ ' '+'file'+' '+'filename'+' '
+		
+		/******* Send initial meta data *********/
+		int metaLength = num_digits_add+1+4+1+strlen(filename)+1;
+		int final_length = length+metaLength;
+		char *metaData = (char *)calloc(metaLength+1, sizeof(char));
+		sprintf(metaData,"%d file %s ",final_length,filename);
+		send_all(destination->file_desc,metaData,metaLength);
+		free(metaData);
 
+		/******* Send file in chunks *********/
+		int sendChunkSize= 100;		//Determines the chunk size
+		while(length>0){
 
-		char *fileBytes = (char *)calloc(final_length,sizeof(char));
-		char *tempBuf = calloc(length,sizeof(char));
-
-		size_t len = fread(tempBuf, 1, length, fp);
-		if (len<0)
-		{
-			perror("read");
-			if (transferType == kDOWN_FL)
+			/******* Read in chunks *********/
+			char *fileBytes = (char *)calloc(sendChunkSize,sizeof(char));
+			size_t len = fread(fileBytes, 1, sendChunkSize, fp);
+			if (len<0)
 			{
-				send_all(destination->file_desc,"35 error Read error at destination ",35);
+				perror("read");
+				if (transferType == kDOWN_FL)
+				{
+					/******* Send each chunk *********/
+					send_all(destination->file_desc,"35 error Read error at destination ",35);
+				}
+				free(fileBytes);
+				return;
 			}
+			//This line sends the chunk
+			send_all(destination->file_desc,fileBytes,len);
+			length = length-len;
 			free(fileBytes);
-			return;
 		}
 
-
-		sprintf(fileBytes,"%d file %s ",final_length,filename);
-		memcpy(fileBytes+(final_length-length), tempBuf,length);
-		int i;
-		send_all(destination->file_desc,fileBytes,final_length);
-		free(fileBytes);
+		/******* Cleanup and print messages *********/
 		fclose(fp);
 		if (transferType==kUP_FL)
 		{
@@ -91,6 +103,7 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 				destination->ip_addr,
 				destination->port);
 		}
+		fflush(stdout);
 
 	}else{
 		perror("file open");
