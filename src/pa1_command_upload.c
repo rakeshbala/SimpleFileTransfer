@@ -108,7 +108,7 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		// printf("Time difference %ld\n", diff_usec);
 		double txRate = (((float)noOfBits)/diff_usec)*1000000;
 
-		printf("Transfer rate %f b/s\n", txRate);
+		// printf("Transfer rate %f b/s\n", txRate);
 
 		/******* Get my host name *********/
 		char my_host_name[50];
