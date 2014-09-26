@@ -182,8 +182,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             fprintf(stderr, "Not able to find host name:%s\n", gai_strerror(name_status));
                         }
 
-                        // struct 
-
+                        char *test;
                         inet_ntop(((struct sockaddr *)&remoteaddr)->sa_family,
                             get_in_addr((struct sockaddr*)&remoteaddr),
                              remoteIP, INET6_ADDRSTRLEN);
@@ -194,10 +193,13 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             char *test = strndup (remoteIP+7,strlen(remoteIP)-7);
                             printf("IPv4 %s\n",test);
                             free(test);
+                        }else{
+                            test = strdup(remoteIP);
                         }
 
                         /******* Push it to the client list *********/
-                        add_to_client_list(&theList, new_fd, host_name, remoteIP);
+                        add_to_client_list(&theList, new_fd, host_name, test);
+                        free(test);
 
 
 
