@@ -87,11 +87,15 @@ void sendStatistics(client_list *theList, int file_desc){
         return;
     }
     strcat(ntw_string,"statistics ");
+    int client_count;
     client_list* loopList = theList;
     while(loopList!=NULL){
+    	client_count++;
     	if (loopList->connection_id ==1)
     	{
+    		loopList=loopList->cl_next;
     		continue;
+
     	}
         sprintf(ntw_string,"%s%s,%d,%.2f,%d,%.2f;",
             ntw_string,
@@ -101,6 +105,11 @@ void sendStatistics(client_list *theList, int file_desc){
             loopList->download_count,
             loopList->sum_dwrate);
         loopList = loopList->cl_next;
+    }
+    /******* Blanks if no connections other than server *********/
+    if (client_count<2)
+    {
+    	sprintf(ntw_string,"%s-,-,-,-,-;",ntw_string);
     }
     size_t length = strlen(ntw_string);
     /******* Length edge case *********/
@@ -151,7 +160,7 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
         client_list *current;
         get_list_entry(theList,&current,file_desc);
 
-        printf("%-27s%-27s%-8s%-11s%-10s%-11s\n", 
+        printf("%-27s%-27s%-8s%-14s%-10s%-11s\n", 
         	current->host_name,
         	tokenArray[0],
         	tokenArray[1],
@@ -171,16 +180,15 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
 }
 
 void printHeader(){
-	
 
-	printf("-------------------------------------- Statistics --------------------------------------------\n");
-	printf("%-27s%-27s%-8s%-11s%-10s%-11s\n","Hostname 1","Hostname 2",
+	printf("\n-------------------------------------- Statistics ----------------------------------------------\n");
+	printf("%-27s%-27s%-8s%-14s%-10s%-11s\n","Hostname 1","Hostname 2",
 		"Uploads",
 		"Average ",
 		"Downloads",
 		"Average ");
-	printf("%-27s%-27s%-8s%-11s%-10s%-11s\n"," "," "," ","upload"," ","download");
-	printf("%-27s%-27s%-8s%-11s%-10s%-11s\n"," "," "," ","speed(bps)"," ","speed(bps)");
-	printf("----------------------------------------------------------------------------------------------\n");
+	printf("%-27s%-27s%-8s%-14s%-10s%-11s\n"," "," "," ","upload"," ","download");
+	printf("%-27s%-27s%-8s%-14s%-10s%-11s\n"," "," "," ","speed(bps)"," ","speed(bps)");
+	printf("------------------------------------------------------------------------------------------------\n");
 
 }

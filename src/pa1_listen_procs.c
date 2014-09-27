@@ -358,7 +358,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                                     loopList=loopList->cl_next;
                                 }
 
-                                if (printFlag==0);
+                                if (printFlag==0)
                                 {
                                     printHeader();
                                 }
