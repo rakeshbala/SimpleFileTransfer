@@ -52,7 +52,7 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 				avg_rxrate = loopList->sum_dwrate/loopList->download_count;
 
 			} 
-			printf("%-28s%-14d%-11f%-16d%-11f\n",
+			printf("%-28s%-14d%-11.2f%-16d%-11.2f\n",
 				loopList->host_name,
 				loopList->upload_count,
 				avg_txrate,
@@ -65,8 +65,122 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 
 
 	}else{
-
+		
+		while(loopList!=NULL){
+			send_all(loopList->file_desc,"14 statistics ",14);
+			loopList=loopList->cl_next;
+		}
 	}
 
+
+}
+
+
+void sendStatistics(client_list *theList, int file_desc){
+
+
+    char *ntw_string = (char *)calloc(1024, sizeof(char));
+    if (!ntw_string)
+    {
+        perror("calloc");
+        printf("Not able to initialize ntw_string\n");
+        return;
+    }
+    strcat(ntw_string,"statistics ");
+    client_list* loopList = theList;
+    while(loopList!=NULL){
+    	if (loopList->connection_id ==1)
+    	{
+    		continue;
+    	}
+        sprintf(ntw_string,"%s%s,%d,%.2f,%d,%.2f;",
+            ntw_string,
+            loopList->host_name,
+            loopList->upload_count,
+            loopList->sum_txrate,
+            loopList->download_count,
+            loopList->sum_dwrate);
+        loopList = loopList->cl_next;
+    }
+    size_t length = strlen(ntw_string);
+    /******* Length edge case *********/
+    int num_digits_temp = noOfDigits((int)length);
+    int num_digits_add = noOfDigits((num_digits_temp+(int)length+1));
+    if (num_digits_temp != num_digits_add)
+    {
+        num_digits_add++;
+    }
+    int final_length = length+num_digits_add+1;
+    char *newString = (char *)calloc(final_length+1, sizeof(char));
+    if (!newString)
+    {
+        perror("calloc");
+        return;
+    }
+    sprintf(newString,"%d %s",final_length,ntw_string);
+    send_all(file_desc,newString,final_length);
+    free(newString);
+    free(ntw_string);
+
+}
+
+void printStatistics(client_list *theList, char *stat_string, int file_desc)
+{
+	char *container;
+    char *strTokInt;
+    container = strtok_r(stat_string,";",&strTokInt);
+    int dummyFd=2;
+
+    while (container)
+    {
+
+        int argc=0;
+        char **tokenArray = (char **)calloc(5, sizeof(char *));
+        char * container2;
+        char * strTokInt2;
+
+        container2 = strtok_r(container,",",&strTokInt2);
+        while (container2)
+        {
+            // tokenArray[argc] = calloc(strlen(container2)+1, sizeof(char));
+            tokenArray[argc] = strdup(container2);
+            argc++;
+            container2 = strtok_r(NULL,",",&strTokInt2);
+        }
+
+        client_list *current;
+        get_list_entry(theList,&current,file_desc);
+
+        printf("%-27s%-27s%-8s%-11s%-10s%-11s\n", 
+        	current->host_name,
+        	tokenArray[0],
+        	tokenArray[1],
+        	tokenArray[2],
+        	tokenArray[3],
+        	tokenArray[4]);
+
+        int i;
+        for (i = 0; i < argc; ++i)
+        {
+            free(tokenArray[i]);
+        }
+        free(tokenArray);
+        container = strtok_r(NULL,";",&strTokInt);
+    }
+
+}
+
+void printHeader(){
+	
+
+	printf("-------------------------------------- Statistics --------------------------------------------\n");
+	printf("%-27s%-27s%-8s%-11s%-10s%-11s\n","Hostname 1","Hostname 2",
+		"Uploads",
+		"Average ",
+		"Downloads",
+		"Average ");
+	printf("%-27s%-27s%-8s%-11s%-10s%-11s\n"," "," "," ","upload"," ","download");
+	printf("%-27s%-27s%-8s%-11s%-10s%-11s\n"," "," "," ","speed(bps)"," ","speed(bps)");
+	printf("----------------------------------------------------------------------------------------------\n");
 
 }

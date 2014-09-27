@@ -345,6 +345,33 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             command_upload(theList,downloadEntry->connection_id,argv[2],kDOWN_FL);
                             printf(PROMPT_NAME);
 
+                        }else if(strcmp(argv[1],"statistics")==0){
+                            if (runningMode==kCLIENT_MODE)
+                            {
+                                sendStatistics(theList,ii);
+                            }else{
+                                static int printFlag = 0;
+                                int connectCount = 0;
+                                client_list *loopList=theList;
+                                while(loopList!=NULL){
+                                    connectCount++;
+                                    loopList=loopList->cl_next;
+                                }
+
+                                if (printFlag==0);
+                                {
+                                    printHeader();
+                                }
+                                printStatistics(theList, recv_buf+13, ii);
+                                printFlag++;
+                                if (printFlag==connectCount)
+                                {
+                                    printFlag = 0;
+                                    printf(PROMPT_NAME);
+                                }
+                            }
+
+
                         }else if(strcmp(argv[1],"error")==0){
                             size_t length = (size_t)(strlen(recv_buf)-9);
                             char *errorString= strndup(recv_buf+9,length);
