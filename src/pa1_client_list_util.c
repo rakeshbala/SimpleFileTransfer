@@ -40,6 +40,10 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
         current->host_name = strdup(host_name);
         current->ip_addr = strdup(ip_addr);
         current->cl_next = NULL;
+        current->upload_count = 0;
+        current->download_count = 0;
+        current->sum_dwrate = 0;
+        current->sum_txrate = 0;
         *theList = current;
 
     }
@@ -187,8 +191,7 @@ bool printClientList(client_list *theList)
         return false;
     }
     printf("\n");
-    printf("                            Available peers\n");
-    printf("-------------------------------------------------------------------------\n");
+    printf("--------------------------- Available peers -----------------------------\n");
     printf("%-5s%-35s%-20s%-8s\n","CID","Host name","IP Address","Port");
     printf("-------------------------------------------------------------------------\n");
     for (; print_list!= NULL; print_list = print_list->cl_next)

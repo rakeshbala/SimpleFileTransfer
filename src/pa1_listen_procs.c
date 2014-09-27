@@ -323,15 +323,18 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                                 long diff_usec = (tv_end.tv_sec*(long)1000000.0+tv_end.tv_usec) -
                                 (tv_start.tv_sec*(long)1000000.0+tv_start.tv_usec);
                                 int noOfBits = (writeLength)*8;
-                                double txRate = (((float)noOfBits)/diff_usec)*1000000.0;
+                                double rxRate = (((float)noOfBits)/diff_usec)*1000000.0;
 
                                 /******* Get my and destination host name *********/
                                 char my_host_name[50];
                                 gethostname(my_host_name,50);
                                 client_list *host;
                                 get_list_entry(theList, &host, ii);
-                                printf("%s -> %s, File size: %d Bytes, Time Taken: %f seconds, Rx Rate: %.2f bits/second\n",
-                                    host->host_name,my_host_name,writeLength,diff_usec/1000000.0, txRate );
+                                printf("Rx: %s -> %s, File size: %d Bytes, Time Taken: %f seconds, Rx Rate: %.2f bits/second\n",
+                                    host->host_name,my_host_name,writeLength,diff_usec/1000000.0, rxRate );
+
+                                host->download_count++;
+                                host->sum_dwrate += rxRate;
 
                             }                        
                             printf(PROMPT_NAME);

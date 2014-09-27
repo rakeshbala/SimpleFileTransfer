@@ -60,6 +60,10 @@ typedef struct theList
     int upload_count;
     int download_count;
 
+    double sum_txrate;
+    double sum_dwrate;
+    
+
     struct theList * cl_next;
 
 } client_list;

@@ -103,17 +103,16 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		long diff_usec = (tv_end.tv_sec*(long)1000000.0+tv_end.tv_usec) -
 			(tv_start.tv_sec*(long)1000000.0+tv_start.tv_usec);
 		int noOfBits = (final_length-metaLength)*8; //length is lost
-		// printf("Start time micro %ld End time micro %ld\n", tv_start.tv_usec, tv_end.tv_usec );
-		// printf("Bits transferred %d\n", noOfBits);
-		// printf("Time difference %ld\n", diff_usec);
 		double txRate = (((float)noOfBits)/diff_usec)*1000000;
 
-		// printf("Transfer rate %f b/s\n", txRate);
+		/******* Update the counters *********/
+		destination->upload_count++;
+		destination->sum_txrate += txRate;
 
 		/******* Get my host name *********/
 		char my_host_name[50];
 		gethostname(my_host_name,50);
-		printf("%s -> %s, File size: %d Bytes, Time Taken: %f seconds, Tx Rate: %.2f bits/second\n",
+		printf("Tx: %s -> %s, File size: %d Bytes, Time Taken: %f seconds, Tx Rate: %.2f bits/second\n",
 			my_host_name,destination->host_name,(final_length-metaLength),
 			diff_usec/1000000.0, txRate );
 

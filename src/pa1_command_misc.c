@@ -19,8 +19,7 @@ void commandList(client_list *theList,RUNNING_MODE runningMode){
 		printf("No connections made.\n");
 		return;
 	}
-	printf("                            Connections\n");
-    printf("-------------------------------------------------------------------------\n");
+    printf("--------------------------- Connections ---------------------------------\n");
 	printf("%-5s%-35s%-20s%-8s\n","ID","Hostname","IP Address","Port No.");
     printf("-------------------------------------------------------------------------\n");
 

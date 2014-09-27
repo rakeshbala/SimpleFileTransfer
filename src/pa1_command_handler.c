@@ -272,6 +272,20 @@ index.html#integrity\n\n");
             }
             break;
         }
+
+        /******* Handle STATISTICS *********/
+        case 11:
+        {
+            if (argc!=1)
+            {
+                printf("Wrong usage.\n USAGE: STATISTICS\n");
+                break;
+            }
+
+            command_statistics(*theList,runningMode);
+            break;
+        }
+
         /******* Handle CLEAR *********/
         case 12:
         {
