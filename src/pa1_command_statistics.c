@@ -23,15 +23,15 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 	}
 	if (runningMode==kCLIENT_MODE)
 	{
-		printf("------------------------------- Statistics -------------------------------------\n");
-		printf("%-28s%-14s%-11s%-16s%-11s\n","Hostname",
+		printf("------------------------------- Statistics -----------------------------------------\n");
+		printf("%-32s%-14s%-11s%-16s%-11s\n","Hostname",
 					"Total uploads",
 					"Average ",
 					"Total downloads",
 					"Average ");
-		printf("%-28s%-14s%-11s%-16s%-11s\n"," "," ","upload"," ","download");
-		printf("%-28s%-14s%-11s%-16s%-11s\n"," "," ","speed(bps)"," ","speed(bps)");
-		printf("--------------------------------------------------------------------------------\n");
+		printf("%-32s%-14s%-11s%-16s%-11s\n"," "," ","upload"," ","download");
+		printf("%-32s%-14s%-11s%-16s%-11s\n"," "," ","speed(bps)"," ","speed(bps)");
+		printf("------------------------------------------------------------------------------------\n");
 		/******* Print current connections  *********/
 		int client_count;
 		while(loopList != NULL){
@@ -53,7 +53,7 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 				avg_rxrate = loopList->sum_dwrate/loopList->download_count;
 
 			} 
-			printf("%-28s%-14d%-11.0f%-16d%-11.0f\n",
+			printf("%-32s%-14d%-11.0f%-16d%-11.0f\n",
 				loopList->host_name,
 				loopList->upload_count,
 				avg_txrate,
@@ -78,7 +78,7 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 				avg_rxrate = loopList->sum_dwrate/loopList->download_count;
 
 			} 
-			printf("%-28s%-14d%-11.0f%-16d%-11.0f\n",
+			printf("%-32s%-14d%-11.0f%-16d%-11.0f\n",
 				loopList->host_name,
 				loopList->upload_count,
 				avg_txrate,
@@ -90,7 +90,7 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 		}
 		if (client_count<2)
 		{
-			printf("%-28s%-14s%-11s%-16s%-11.0s\n","-","-","-","-","-");
+			printf("%-32s%-14s%-11s%-16s%-11s\n","-","-","-","-","-");
 		}
 
 	}else{
@@ -227,7 +227,7 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
         client_list *current;
         get_list_entry(theList,&current,file_desc);
 
-        printf("%-27s%-27s%-8s%-14s%-10s%-11s\n", 
+        printf("%-32s%-32s%-8s%-14s%-10s%-11s\n", 
         	current->host_name,
         	tokenArray[0],
         	tokenArray[1],
@@ -248,14 +248,14 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
 
 void printHeader(){
 
-	printf("\n-------------------------------------- Statistics ----------------------------------------------\n");
-	printf("%-27s%-27s%-8s%-14s%-10s%-11s\n","Hostname 1","Hostname 2",
+	printf("\n---------------------------------------- Statistics -------------------------------------------------\n");
+	printf("%-32s%-32s%-8s%-14s%-10s%-11s\n","Hostname 1","Hostname 2",
 		"Uploads",
 		"Average ",
 		"Downloads",
 		"Average ");
-	printf("%-27s%-27s%-8s%-14s%-10s%-11s\n"," "," "," ","upload"," ","download");
-	printf("%-27s%-27s%-8s%-14s%-10s%-11s\n"," "," "," ","speed(bps)"," ","speed(bps)");
-	printf("------------------------------------------------------------------------------------------------\n");
+	printf("%-32s%-32s%-8s%-14s%-10s%-11s\n"," "," "," ","upload"," ","download");
+	printf("%-32s%-32s%-8s%-14s%-10s%-11s\n"," "," "," ","speed(bps)"," ","speed(bps)");
+	printf("-----------------------------------------------------------------------------------------------------\n");
 
 }
