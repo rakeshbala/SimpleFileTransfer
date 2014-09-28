@@ -49,7 +49,7 @@ typedef enum
 } bool;
 
 
-/******* Linked list declaration for holding all ips *********/
+/******* Linked list declaration for holding all connections *********/
 typedef struct theList
 {
     int connection_id;
@@ -76,4 +76,5 @@ extern char * listening_port;
 extern char * my_ip_addr;
 extern fd_set master;
 extern int fd_max;
+extern int listen_socket;
 #endif

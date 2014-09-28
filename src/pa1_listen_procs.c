@@ -132,6 +132,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 
     FD_SET(0,&master); // stdin for select()
     FD_SET(listening_socket, &master); //for listening for connections
+    listen_socket = listening_socket;
     fd_max = listening_socket;
 
 

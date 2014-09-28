@@ -10,7 +10,7 @@ September 22nd 2014
 #include <stdio.h>
 
 
-
+int listen_socket;
 
 void commandList(client_list *theList,RUNNING_MODE runningMode){
 
@@ -62,8 +62,10 @@ void commandTerminate(client_list **theList, RUNNING_MODE runningMode, int conne
 		if (loopList->connection_id == connection_id)
 		{
 			remove_from_client_list(theList,loopList->file_desc);
+			publish_list_to_client(*theList,listen_socket);
 			return;
 		}
+		loopList=loopList->cl_next;
 	}
 
 	fprintf(stderr, "No connections exist for the given connection id\n");
