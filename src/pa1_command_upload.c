@@ -78,7 +78,7 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		free(metaData);
 
 		/******* Send file in chunks *********/
-		int sendChunkSize= 100;		//Determines the chunk size
+		int sendChunkSize= 1000;		//Determines the chunk size
 
 		/******* Mark start time *********/
 		struct timeval tv_start;
