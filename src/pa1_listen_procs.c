@@ -191,10 +191,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                              remoteIP, INET6_ADDRSTRLEN);
                         if (((struct sockaddr *)&remoteaddr)->sa_family==AF_INET6)
                         {
-                            
-                            printf("IPv6 %s\n",remoteIP);
                             test = strndup (remoteIP+7,strlen(remoteIP)-7);
-                            printf("IPv4 %s\n",test);
                         }else{
                             test = strdup(remoteIP);
                         }

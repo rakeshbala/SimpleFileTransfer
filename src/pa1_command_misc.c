@@ -52,7 +52,7 @@ void commandList(client_list *theList,RUNNING_MODE runningMode){
 void commandTerminate(client_list **theList, RUNNING_MODE runningMode, int connection_id)
 {
 
-	if (runningMode=kCLIENT_MODE&& connection_id == 1)
+	if (runningMode==kCLIENT_MODE && connection_id == 1)
 	{
 		fprintf(stderr, "Terminate of server from client not allowed\n");
 		return;
