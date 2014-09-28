@@ -122,6 +122,7 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 		/******* Get my host name *********/
 		char my_host_name[50];
 		gethostname(my_host_name,50);
+		printf("File '%s' uploaded",filename);
 		printf("Tx: %s -> %s, File size: %d Bytes, Time Taken: %f seconds, Tx Rate: %.2f bits/second\n",
 			my_host_name,destination->host_name,(final_length-metaLength),
 			diff_usec/1000000.0, txRate );

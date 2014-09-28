@@ -146,6 +146,7 @@ bool recv_n_write(int socket_fd, char *buffer,int buffer_len, int nbytes, char *
 			tempLen -= bytesRecv; //update length
 			free(temp);
 		}
+		printf("File '%s' written to disk",fileName);
 	}else{
 		perror("fopen");
 		return false;
