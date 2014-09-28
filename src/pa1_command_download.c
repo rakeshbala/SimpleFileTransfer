@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 25, 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_command_download.c
+Description : functions related ot command "DOWNLOAD"
+@author     : Rakesh Balasubramanian
+@created    : 26 Sep 2014
+**********************************************************/
 #include "global.h"
 #include "pa1_command_download.h"
 
@@ -10,6 +11,14 @@ September 25, 2014
 #include <stdlib.h>
 #include <string.h>
 
+
+/****************************************************************
+Description : Download file from a destingation with connection id
+@arg 		: theList the list pointer
+@arg 		: connection_id connection_id from where download happens
+@arg 		: path file path
+@return 	: void
+*****************************************************************/
 void command_download(client_list *theList, int connection_id, char * path)
 {
 	if (connection_id==1)

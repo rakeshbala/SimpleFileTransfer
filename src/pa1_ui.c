@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-PA1_UI.c -- UI Related code
-September 8th 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_ui.c
+Description : STDIN input and handling
+@author     : Rakesh Balasubramanian
+@created    : 8 Sep 2014
+**********************************************************/
 
 /******* Include user header files *********/
 #include "pa1_ui.h"
@@ -24,6 +25,13 @@ September 8th 2014
 /******* Function declarations *********/
 
 /******* Function definitions *********/
+
+/****************************************************************
+Description  : Initialize and start the application processing
+@arg         : runningMode client/server mode
+@arg         : port listening port number of application
+@return      : void
+*****************************************************************/
 void startApp(RUNNING_MODE runningMode, char * port)
 {
 
@@ -42,7 +50,14 @@ void startApp(RUNNING_MODE runningMode, char * port)
 }
 
 
-
+/****************************************************************
+Description  : Do input processing and get input from STDIN and 
+               dispatch input for processing
+@arg         : runningMode client/server mode
+@arg         : listening_socket socket file descriptor
+@arg         : theList address of the list pointer
+@return      : void
+*****************************************************************/
 void exitOrHoldCursor(RUNNING_MODE runningMode,int listening_socket, client_list **theList)
 {
     /*************************************************

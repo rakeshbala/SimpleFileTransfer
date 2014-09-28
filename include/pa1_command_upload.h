@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 24th
-*************************************************/
+/**********************************************************
+File name   : pa1_command_upload.h
+Description : functions related to command 'UPLOAD'
+@author     : Rakesh Balasubramanian
+@created    : 24 Sep 2014
+**********************************************************/
 
 #include "global.h"
 #ifndef PA1_COMMAND_UPLOAD_H_

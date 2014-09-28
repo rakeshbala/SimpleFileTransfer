@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 21
-*************************************************/
+/**********************************************************
+File name   : pa1_client_connect.c
+Description : Validation of connect after calling connect
+@author     : Rakesh Balasubramanian
+@created    : 21st Sep 2014
+**********************************************************/
 #include "global.h"
 #include "pa1_client_connect.h"
 #include "pa1_command_handler.h"
@@ -10,8 +11,18 @@ September 21
 #include <stdlib.h>
 #include <stdio.h>
 
-char * my_ip_addr;
 
+char * my_ip_addr; //global to store my ip
+
+
+/****************************************************************
+Description : Validate connect 'after' being connected
+@arg 		: theList client_list that holds all connections
+@arg 		: file_desc socket file descriptor of incoming
+@arg 		: port port string of incoming connection
+@return 	: bool value indicating (un)successful validation
+{9:References}
+*****************************************************************/
 bool validate_connect(client_list *theList, int file_desc, char *port){
 
 	/******* Validate connect cases *********/

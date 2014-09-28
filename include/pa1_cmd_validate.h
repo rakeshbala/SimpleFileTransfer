@@ -1,8 +1,11 @@
-/**
-* pa1_cmd_validate.c
-*
-* Constants and functions related to command line argument validation
-*/
+/**********************************************************
+File name   : pa1_cmd_validate.h
+Description : functions related to command line argument 
+			  validation
+@author     : Rakesh Balasubramanian
+@created    : 28 Sep 2014
+**********************************************************/
+
 
 #include "global.h"
 

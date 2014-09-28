@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-Server functions - pa1_listen_procs.h
-September 13
-*************************************************/
+/**********************************************************
+File name   : pa1_listen_procs.h
+Description : Main select multiplexing loop and dispatching
+@author     : rab
+@created    : 13th Sep 2014
+**********************************************************/
 
 #include "global.h"
 

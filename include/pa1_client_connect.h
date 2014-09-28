@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasbramanian
-
-September 21st 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_client_connect.h
+Description : Validation of connect after calling connect
+@author     : Rakesh Balasubramanian
+@created    : 21st Sep 2014
+**********************************************************/
 
 #include "global.h"
 

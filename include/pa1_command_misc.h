@@ -1,8 +1,11 @@
-/*************************************************
-Rakesh Balasubramanian
+/**********************************************************
+File name   : pa1_command_misc.h
+Description : Functions related to "LIST", "TERMINATE" and
+			  "EXIT"
+@author     : Rakesh Balasubramanian
+@created    : 28 Sep 2014
+**********************************************************/
 
-September 22nd 2014
-*************************************************/
 
 #include "global.h"
 

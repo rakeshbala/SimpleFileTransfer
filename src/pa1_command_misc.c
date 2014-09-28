@@ -1,8 +1,10 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 22nd 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_command_misc.c
+Description : Functions related to "LIST", "TERMINATE" and
+			  "EXIT"
+@author     : Rakesh Balasubramanian
+@created    : 28 Sep 2014
+**********************************************************/
 
 #include "global.h"
 #include "pa1_command_misc.h"
@@ -12,6 +14,15 @@ September 22nd 2014
 
 int listen_socket;
 
+
+
+/****************************************************************
+Description : Handle list command and display information of all
+			  connected peers
+@arg 		: theList the list pointer
+@arg 		: runningMode client/server mode
+@return 	: void
+*****************************************************************/
 void commandList(client_list *theList,RUNNING_MODE runningMode){
 
 	if (theList==NULL)
@@ -48,7 +59,14 @@ void commandList(client_list *theList,RUNNING_MODE runningMode){
 }
 
 
-
+/****************************************************************
+Description : Handle terminate command and close connection to
+			  a connected peer
+@arg 		: theList address of the list pointer
+@arg 		: runningMode client/server mode
+@arg 		: connection_id connection id of client to terminate
+@return 	: void
+*****************************************************************/
 void commandTerminate(client_list **theList, RUNNING_MODE runningMode, int connection_id)
 {
 
@@ -72,7 +90,11 @@ void commandTerminate(client_list **theList, RUNNING_MODE runningMode, int conne
 
 }
 
-
+/****************************************************************
+Description : Exit the program after closing all connections
+@arg 		: theList address of the list pointer
+@return 	: void
+*****************************************************************/
 void commandExit(client_list **theList){
 
 	client_list * loopList = *theList;

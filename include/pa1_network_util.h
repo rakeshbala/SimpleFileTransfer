@@ -1,8 +1,10 @@
-/*************************************************
-Rakesh Balasubramanian
+/**********************************************************
+File name   : pa1_network_util.h
+Description : Generic network utility functions
+@author     : Rakesh Balasubramanian
+@created    : 14 Sep 2014
+**********************************************************/
 
-September 14th 2014
-*************************************************/
 #include <sys/socket.h>
 #include "global.h"
 

@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 14th, 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_command_statistics.c
+Description : functions related to thed command 'STATISTICS'
+@author     : Rakesh Balasubramanian
+@created    : 26 Sep 2014
+**********************************************************/
 
 #include "global.h"
 #include "pa1_command_statistics.h"
@@ -13,6 +14,13 @@ September 14th, 2014
 #include <string.h>
 
 
+/****************************************************************
+Description : Handle statistics command for client and server and
+			  and display statistic information
+@arg 		: theList  the list pointer
+@arg 		: runningMode client/server mode
+@return 	: void
+*****************************************************************/
 void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 
 	client_list *loopList = theList;	
@@ -104,7 +112,12 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 
 }
 
-
+/****************************************************************
+Description : Send statistic from client to server
+@arg 		: theList the list pointer
+@arg 		: file_desc socket file descriptor
+@return 	: void
+*****************************************************************/
 void sendStatistics(client_list *theList, int file_desc){
 
 
@@ -200,6 +213,14 @@ void sendStatistics(client_list *theList, int file_desc){
 
 }
 
+
+/****************************************************************
+Description : Print the statistics to stdout
+@arg 		: theList  the list pointer
+@arg 		: stat_string string to be parsed
+@arg 		: file_desc socket file descriptor
+@return 	: void
+*****************************************************************/
 void printStatistics(client_list *theList, char *stat_string, int file_desc)
 {
 	char *container;
@@ -246,6 +267,10 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
 
 }
 
+/****************************************************************
+Description  : Print header before statistics
+@return 	 : void
+*****************************************************************/
 void printHeader(){
 
 	printf("\n------------------------------------------ Statistics -------------------------------------------------\n");

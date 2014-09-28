@@ -1,8 +1,10 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 19th
-*************************************************/
+/**********************************************************
+File name   : pa1_client_list_util.c
+Description : Methods to modify the core linked list of type
+              client_list
+@author     : Rakesh Balasubramanian
+@created    : 19th Sep 2014
+**********************************************************/
 
 #include "pa1_client_list_util.h"
 
@@ -22,12 +24,17 @@ September 19th
 #include <stdio.h>
 
 
-client_list *removed_list;
+client_list *removed_list; //global to add connections that were removed
 
-/*************************************************
-Psuedo-code/code used from
-http://www.learn-c.org/en/Linked_lists - Begin
-*************************************************/
+/****************************************************************
+Description  : Add an entry to the client_list and populate values
+              (except port)
+@arg         : theList address of the list pointer
+@arg         : file_desc socket file descriptor
+@arg         : host_name host name of the entry
+@return      : void
+Ref: http://www.learn-c.org/en/Linked_lists
+*****************************************************************/
 void add_to_client_list(client_list **theList, int file_desc, char *host_name, char *ip_addr)
 {
 
@@ -75,7 +82,14 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
 
 
 
-/******* Remove an entry from client list *********/
+/****************************************************************
+Description  : Remove an entry from the client_list and also add
+               to the removed list
+@arg         : theList address of the list pointer
+@arg         : file_desc socket file descriptor
+@return      : int status
+Ref: http://www.learn-c.org/en/Linked_lists
+*****************************************************************/
 int remove_from_client_list(client_list **theList, int file_desc){
     if (*theList==NULL )
     {
@@ -99,7 +113,7 @@ int remove_from_client_list(client_list **theList, int file_desc){
     
 
 
-    if (!(current == sip_list))
+    if (!(current == sip_list))//ignore if sip_list
     {
         close(file_desc);
         FD_CLR(file_desc,&master);
@@ -130,17 +144,14 @@ int remove_from_client_list(client_list **theList, int file_desc){
     temp_node = NULL;
 }
 
-int pop(client_list ** theList,int file_desc) {
-    int retval = -1;
-    
-    return retval;
-}
 
-/*************************************************
-Code psuedo code used from
-http://www.learn-c.org/en/Linked_lists - End
-*************************************************/
-
+/****************************************************************
+Description  : Populate port of an entry in the client_list
+@arg         : theList client_list which contains the entry
+@arg         : file_desc socket file descriptor
+@arg         : port_num port number
+@return      : void
+*****************************************************************/
 void add_port_to_client(client_list *theList, int file_desc ,char *port_num)
 {
 
@@ -168,7 +179,13 @@ void add_port_to_client(client_list *theList, int file_desc ,char *port_num)
 
 }
 
-
+/****************************************************************
+Description  : Change connection id of a particular entry in list
+@arg         : theList address of the list pointer
+@arg         : file_desc socket file descriptor
+@arg         : cid connection id being assigned
+@return      : void
+*****************************************************************/
 void change_connect_id(client_list **theList, int file_desc ,int cid)
 {
 
@@ -183,6 +200,14 @@ void change_connect_id(client_list **theList, int file_desc ,int cid)
     }
 }
 
+
+/****************************************************************
+Description  : Assign null to the port of a particular entry
+@arg         : theList address of the list pointer
+@arg         : file_desc socket file descriptor
+@return      : void
+
+*****************************************************************/
 void change_port_null(client_list **theList, int file_desc)
 {
 
@@ -197,7 +222,16 @@ void change_port_null(client_list **theList, int file_desc)
     }
 }
 
-
+/****************************************************************
+Description  : Set transfer rates associated with each entry
+@arg         : theList address to list pointer
+@arg         : file_desc socket file descriptor
+@arg         : upload_count # of uploads
+@arg         : sum_txrate sum of upload rates
+@arg         : download_count # of downloads
+@arg         : sum_dwrate sum of download reates
+@return      : void
+*****************************************************************/
 void setTransferRates(client_list **theList, int file_desc, 
     int upload_count,double sum_txrate, int download_count, double sum_dwrate)
 {
@@ -216,6 +250,13 @@ void setTransferRates(client_list **theList, int file_desc,
 }
 
 
+/****************************************************************
+Description  : Find an entry from list with file descriptor
+@arg         : theList client_list pointer
+@arg         : theList address of an entry pointer
+@arg         : file_desc socket file descriptor
+@return      : bool indicating if successful fetch
+*****************************************************************/
 bool get_list_entry(client_list *theList,client_list **theEntry, int file_desc){
     *theEntry = theList;
     while(theEntry!=NULL){
@@ -230,7 +271,11 @@ bool get_list_entry(client_list *theList,client_list **theEntry, int file_desc){
 }
 
 
-/******* Print a client list *********/
+/****************************************************************
+Description  : Iterate and print the list
+@arg         : theList list to be printed
+@return      : bool indicating if list is printable
+*****************************************************************/
 bool printClientList(client_list *theList)
 {
     client_list *print_list;
@@ -256,7 +301,11 @@ bool printClientList(client_list *theList)
     return true;
 }
 
-/******* Free a linked list *********/
+/****************************************************************
+Description  : Free memory allocated to the linked list
+@arg         : theList address of the list pointer
+@return      : void
+*****************************************************************/
 void freeLinkedList(client_list **theList){
     client_list *tempNode;
     while(*theList){

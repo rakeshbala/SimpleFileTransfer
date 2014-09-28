@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 13th
-*************************************************/
+/**********************************************************
+File name   : pa1_listen_procs.c
+Description : Main select multiplexing loop and dispatching
+@author     : rab
+@created    : 13th Sep 2014
+**********************************************************/
 
 #define _GNU_SOURCE 1
 
@@ -37,6 +38,15 @@ char * create_list_string(client_list *theList);
 void publish_list_to_client(client_list *theList, int file_desc);
 
 
+
+/****************************************************************
+Description  : Select multiplexing over an infinte loop and handling 
+               each network commands
+@arg         : runningMode client/server mode
+@arg         : port listening port
+@return      : status to indicate success/error
+Ref: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#select
+*****************************************************************/  
 int listen_at_port(RUNNING_MODE runningMode, char * port)
 {
 
@@ -469,7 +479,11 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
 }
 
 
-
+/****************************************************************
+Description  : Create string to be sent to clients
+@arg         : theList the list pointer
+@return      : the created String
+*****************************************************************/
 char * create_list_string(client_list *theList)
 {
     char *ntw_string = (char *)calloc(1024, sizeof(char));
@@ -513,6 +527,14 @@ char * create_list_string(client_list *theList)
 }
 
 
+
+/****************************************************************
+Description  : Send the updated server ip list to all clients
+@arg         : theList the list pointer
+@arg         : listening_socket listening socket of server
+@return      : void
+Ref: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#select
+*****************************************************************/
 void publish_list_to_client(client_list *theList, int listening_socket){
 
     char *ntw_string = create_list_string(theList);

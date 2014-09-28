@@ -1,10 +1,10 @@
-/**
-* cmd_arg_validate
-*
-* @param  argc int
-* @param  argv char **
-* @return 1 SUCCESS
-*/
+/**********************************************************
+File name   : pa1_cmd_validate.c
+Description : functions related to command line argument 
+              validation
+@author     : Rakesh Balasubramanian
+@created    : 28 Sep 2014
+**********************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>

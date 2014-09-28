@@ -1,8 +1,10 @@
-// pa1_command_handler.c
-/*************************************************
-Rakesh Balasubramanian
-September 9th, 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_command_handler.c
+Description : function for handling and dispatching typed in 
+              commands
+@author     : Rakesh Balasubramanian
+@created    : 9 Sep 2014
+**********************************************************/
 
 #include "global.h"
 #include "pa1_command_handler.h"
@@ -39,20 +41,24 @@ int commandDispatch(int argc, char **argv, int commandIndex,
 void commandHelp(RUNNING_MODE runningMode, char *command);
 void commandMyip();
 void commandMyport();
+
 /******* Function definitions *********/
 
 
-
+/****************************************************************
+Description  : Process input from STDIN and dispatch to corresponding
+               methods
+@arg         : argc token count
+@arg         : argv token array
+@arg         : runningMode client/server mode
+@return      : status of processing command
+*****************************************************************/
 int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode, client_list **theList)
 {
 
     /******* Check if valid command and get command index *********/
     int commandIndex;
-    if(checkIfCommand(argv[0],&commandIndex))
-    {
-
-    }
-    else
+    if(!checkIfCommand(argv[0],&commandIndex))
     {
         fprintf(stderr, "Unknown command: %s", argv[0]);
         return 1;
@@ -65,7 +71,12 @@ int processCommandArray(int argc, char **argv, RUNNING_MODE runningMode, client_
 
 }
 
-
+/****************************************************************
+Description  : Check if command present in recognized list
+@arg         : commandString the command to be checked
+@arg         : index out variable command index
+@return      : boolean specifying if command is present
+*****************************************************************/
 bool checkIfCommand(char *commandString,int *index)
 {
 
@@ -83,7 +94,16 @@ bool checkIfCommand(char *commandString,int *index)
     return false;
 }
 
-
+/****************************************************************
+Description  : Process input from STDIN and dispatch to corresponding
+               methods
+@arg         : argc token count
+@arg         : argv token array
+@arg         : commandIndex index of command in the command list
+@arg         : runningMode client/server mode
+@arg         : theList address of the list pointer
+@return      : status of processing command
+*****************************************************************/
 int commandDispatch(int argc, char **argv, int commandIndex,
                     RUNNING_MODE runningMode, client_list **theList)
 {
@@ -298,7 +318,12 @@ index.html#integrity\n\n");
 
 }
 
-/******* HELP command *********/
+/****************************************************************
+Description  : Display help information
+@arg         : runningMode client/server mode
+@arg         : command command string 
+@return      : void
+*****************************************************************/
 void commandHelp(RUNNING_MODE runningMode,char * command)
 {
 
@@ -362,6 +387,12 @@ STINATION> <PORT NO>",
     }
 }
 
+
+/****************************************************************
+Description  : Display own ip address
+@return      : void
+Ref: http://man7.org/linux/man-pages/man3/getifaddrs.3.html
+*****************************************************************/
 void commandMyip()
 {
 

@@ -1,3 +1,10 @@
+/**********************************************************
+File name   : global.h
+Description : Global constants, macros and enumerations
+@author     : Rakesh Balasubramanian
+@created    : 3rd September 2014
+**********************************************************/
+
 #define POSIX_C_SOURCE 200809L
 #include <sys/types.h>
 
@@ -6,6 +13,8 @@
 
 #define HOSTNAME_LEN 128
 #define MAX_PARALLEL_DOWNLOAD 3
+
+
 
 /*************************************************
 Taken from:

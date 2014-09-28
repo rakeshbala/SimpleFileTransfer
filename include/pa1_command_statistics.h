@@ -1,8 +1,10 @@
-/*************************************************
-Rakesh Balasubramanian
+/**********************************************************
+File name   : pa1_command_statistics.h
+Description : functions related to thed command 'STATISTICS'
+@author     : Rakesh Balasubramanian
+@created    : 26 Sep 2014
+**********************************************************/
 
-September 26th, 2014
-*************************************************/
 
 #include "global.h"
 

@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 14th 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_client_register.c
+Description : functions  and enums involving REGISTER command
+@author     : Rakesh Balasubramanian
+@created    : 14th Sep 2014
+**********************************************************/
 
 
 #include "global.h"
@@ -30,6 +31,15 @@ fd_set master;
 client_list *sip_list;
 char * my_ip_addr;
 
+
+/****************************************************************
+Description  : Command for 'CONNECT' and 'REGISTER'
+@arg         : destination destination ip/host name
+@arg         : portStr destination port
+@arg         : theList address to list pointer
+@arg         : fl flag to indicate connect/register
+@return      : void
+*****************************************************************/
 void command_connect(char * destination, char *portStr, client_list **theList, connect_flag fl)
 {
 
@@ -156,6 +166,12 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
 
 }
 
+
+/****************************************************************
+Description  : Parse and print the server ip list
+@arg         : SIPlist_str string to be parsed
+@return      : void
+*****************************************************************/
 void parseAndPrintSIPList(char *SIPlist_str){
 
     char *container;

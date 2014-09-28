@@ -1,8 +1,9 @@
-/*************************************************
-Rakesh Balasubramanian
-
-September 14th 2014
-*************************************************/
+/**********************************************************
+File name   : pa1_network_util.c
+Description : Generic network utility functions
+@author     : Rakesh Balasubramanian
+@created    : 14 Sep 2014
+**********************************************************/
 #include "global.h"
 
 #include <stdio.h>
@@ -17,8 +18,12 @@ September 14th 2014
 
 
 
-// get sockaddr, IPv4 or IPv6:
-/******* From Beej's network programming guide *********/
+/****************************************************************
+Description  : function pointer to get ipv4 or ipv6 depending on family
+@arg 		 : sa the sockaddr structure for supplying family
+@return 	 : void 
+Ref: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#select
+*****************************************************************/
 void *get_in_addr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET)
@@ -30,11 +35,16 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 
-/*************************************************
-Idea from
-http://stackoverflow.com/questions/13479760/c-
-socket-recv-and-send-all-data
-*************************************************/
+
+/****************************************************************
+Description : Send to socket all data irrespective of send buffer
+			: restrictions
+@arg 		: socket_fd socket file descriptor
+@arg 		: buffer string/bytes to send
+@arg 		: buffer_len length of bytes to send
+@return 	: status indicating success/failure
+Ref:http://stackoverflow.com/questions/13479760/c-socket-recv-and-send-all-data
+*****************************************************************/	
 bool send_all(int socket_fd, char *buffer,int buffer_len){
 
 	char *ptr =  buffer;
@@ -53,7 +63,15 @@ bool send_all(int socket_fd, char *buffer,int buffer_len){
 }
 
 
-
+/****************************************************************
+Description : Receive from socket all data irrespective of recv buffer
+			: restrictions
+@arg 		: socket_fd socket file descriptor
+@arg 		: buffer string/bytes already received
+@arg 		: buffer_len length of bytes to receive
+@arg 		: nbytes previously received bytes
+@return 	: status indicating success/failure
+*****************************************************************/	
 bool recv_all(int socket_fd, char *buffer,int buffer_len, int nbytes){
 
 	char *temp = (char *)calloc(buffer_len+1,sizeof(char));
@@ -81,7 +99,14 @@ bool recv_all(int socket_fd, char *buffer,int buffer_len, int nbytes){
 }
 
 
-
+/****************************************************************
+Description : Write to file as and when receiving data
+@arg 		: socket_fd socket file descriptor	
+@arg 		: buffer data already received
+@arg 		: arg3 data length to be received
+@arg 		: fileName file name of the file to be written
+@return 	: return
+*****************************************************************/
 bool recv_n_write(int socket_fd, char *buffer,int buffer_len, int nbytes, char *fileName){
 
 
@@ -130,11 +155,12 @@ bool recv_n_write(int socket_fd, char *buffer,int buffer_len, int nbytes, char *
 }
 
 
-// double calculateTransferRate(timeval start, timeval end, long bits){
-	
-// }
 
-
+/****************************************************************
+Description  : Get digits of a number
+@arg 		 : num number whose digits needs to be calculated
+@return 	 : number of digits
+*****************************************************************/
 int noOfDigits(int num){
     int digits = 0;
     while(num>0){
