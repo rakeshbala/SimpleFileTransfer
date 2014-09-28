@@ -18,9 +18,9 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 	client_list *loopList = theList;	
 	if (loopList==NULL)
 	{
-		printf("No connections exist.\n");
+		printf("No connections exist\n");
+		return;
 	}
-
 	if (runningMode==kCLIENT_MODE)
 	{
 		printf("------------------------------- Statistics -------------------------------------\n");
@@ -32,9 +32,10 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 		printf("%-28s%-14s%-11s%-16s%-11s\n"," "," ","upload"," ","download");
 		printf("%-28s%-14s%-11s%-16s%-11s\n"," "," ","speed(bps)"," ","speed(bps)");
 		printf("--------------------------------------------------------------------------------\n");
-			
+		/******* Print current connections  *********/
+		int client_count;
 		while(loopList != NULL){
-
+			client_count++;
 			if (loopList->connection_id==1) //ignore server
 			{
 				loopList=loopList->cl_next;
@@ -62,10 +63,38 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 			loopList= loopList->cl_next;
 
 		}
+		/******* Print old connections too *********/
+		loopList = removed_list;
+		while(loopList != NULL){
+			client_count++;
+			double avg_txrate = 0;
+			if (loopList->upload_count!=0)
+			{
+				avg_txrate = loopList->sum_txrate/loopList->upload_count;
+			}
+			double avg_rxrate = 0;
+			if (loopList->download_count != 0)
+			{
+				avg_rxrate = loopList->sum_dwrate/loopList->download_count;
 
+			} 
+			printf("%-28s%-14d%-11.2f%-16d%-11.2f\n",
+				loopList->host_name,
+				loopList->upload_count,
+				avg_txrate,
+				loopList->download_count,
+				avg_rxrate);
+
+			loopList= loopList->cl_next;
+
+		}
+		if (client_count<2)
+		{
+			printf("%-28s%-14s%-11s%-16s%-11.2s\n","-","-","-","-","-");
+		}
 
 	}else{
-		
+		printf("Querying clients...\n");
 		while(loopList!=NULL){
 			send_all(loopList->file_desc,"14 statistics ",14);
 			loopList=loopList->cl_next;
@@ -87,6 +116,8 @@ void sendStatistics(client_list *theList, int file_desc){
         return;
     }
     strcat(ntw_string,"statistics ");
+    
+    /******* Creat string for existing connections *********/
     int client_count;
     client_list* loopList = theList;
     while(loopList!=NULL){
@@ -97,15 +128,51 @@ void sendStatistics(client_list *theList, int file_desc){
     		continue;
 
     	}
+    	double avg_txrate = 0;
+    	if (loopList->upload_count!=0)
+    	{
+    		avg_txrate = loopList->sum_txrate/loopList->upload_count;
+    	}
+    	double avg_rxrate = 0;
+    	if (loopList->download_count != 0)
+    	{
+    		avg_rxrate = loopList->sum_dwrate/loopList->download_count;
+
+    	} 
         sprintf(ntw_string,"%s%s,%d,%.2f,%d,%.2f;",
             ntw_string,
             loopList->host_name,
             loopList->upload_count,
-            loopList->sum_txrate,
+            avg_txrate,
             loopList->download_count,
-            loopList->sum_dwrate);
+            avg_rxrate);
         loopList = loopList->cl_next;
     }
+    /******* Create string for old connections too *********/
+    loopList= removed_list;
+    while(loopList!=NULL){
+    	client_count++;
+    	double avg_txrate = 0;
+    	if (loopList->upload_count!=0)
+    	{
+    		avg_txrate = loopList->sum_txrate/loopList->upload_count;
+    	}
+    	double avg_rxrate = 0;
+    	if (loopList->download_count != 0)
+    	{
+    		avg_rxrate = loopList->sum_dwrate/loopList->download_count;
+    	} 
+        sprintf(ntw_string,"%s%s,%d,%.2f,%d,%.2f;",
+            ntw_string,
+            loopList->host_name,
+            loopList->upload_count,
+            avg_txrate,
+            loopList->download_count,
+            avg_rxrate);
+        loopList = loopList->cl_next;
+    }
+
+
     /******* Blanks if no connections other than server *********/
     if (client_count<2)
     {

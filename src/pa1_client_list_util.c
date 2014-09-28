@@ -21,6 +21,9 @@ September 19th
 #include <string.h>
 #include <stdio.h>
 
+
+client_list *removed_list;
+
 /*************************************************
 Psuedo-code/code used from
 http://www.learn-c.org/en/Linked_lists - Begin
@@ -44,6 +47,7 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
         current->download_count = 0;
         current->sum_dwrate = 0;
         current->sum_txrate = 0;
+        current->port = NULL;
         *theList = current;
 
     }
@@ -56,12 +60,14 @@ void add_to_client_list(client_list **theList, int file_desc, char *host_name, c
         new_entry->file_desc = file_desc;
         new_entry->host_name = strdup(host_name);
         new_entry->ip_addr = strdup(ip_addr);
+        new_entry->port = NULL;
+
         new_entry->cl_next = *theList;
         *theList = new_entry;
     }
 
     /******* Dont print when adding to sip_list *********/
-    if (!(*theList == sip_list))
+    if (!(*theList == sip_list) && !(*theList == removed_list))
     {
         printf("\n%s (%s): Trying to connect (fd %d)...\n",host_name,ip_addr,file_desc);
     }
@@ -80,6 +86,18 @@ int remove_from_client_list(client_list **theList, int file_desc){
     int i = 0;
     client_list * current = *theList;
     client_list * temp_node = NULL;
+
+    /******* Add to removed list for statistics *********/
+    if (current->port != NULL)
+    {
+         add_to_client_list(&removed_list, file_desc, current->host_name,current->ip_addr);
+         add_port_to_client(removed_list, file_desc, current->port);
+         setTransferRates(&removed_list, file_desc, current->upload_count,
+            current->sum_txrate, current->download_count, current->sum_dwrate);
+
+    }
+    
+
 
     if (!(current == sip_list))
     {
@@ -132,7 +150,7 @@ void add_port_to_client(client_list *theList, int file_desc ,char *port_num)
         {
             // loopList->port = (char *)calloc(6, sizeof(char));
             loopList->port = strdup(port_num);
-            if (!(loopList==sip_list))
+            if (!(loopList==sip_list) && !(loopList == removed_list))
             {
                 printf("%s (%s : %s): Connected. (fd: %d)...\n",                
                         loopList->host_name,
@@ -165,6 +183,37 @@ void change_connect_id(client_list **theList, int file_desc ,int cid)
     }
 }
 
+void change_port_null(client_list **theList, int file_desc)
+{
+
+    client_list *loopList = *theList;
+    while(loopList!=NULL){
+        if (loopList->file_desc == file_desc)
+        {
+            loopList->port = NULL;
+            return;
+        }
+        loopList= loopList->cl_next;
+    }
+}
+
+
+void setTransferRates(client_list **theList, int file_desc, 
+    int upload_count,double sum_txrate, int download_count, double sum_dwrate)
+{
+    client_list *loopList = *theList;
+    while(loopList!=NULL){
+        if (loopList->file_desc == file_desc)
+        {
+            loopList->upload_count = upload_count;
+            loopList->download_count = download_count;
+            loopList->sum_txrate = sum_txrate;
+            loopList->sum_dwrate = sum_dwrate;
+            return;
+        }
+        loopList= loopList->cl_next;
+    }
+}
 
 
 bool get_list_entry(client_list *theList,client_list **theEntry, int file_desc){

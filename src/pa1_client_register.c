@@ -35,6 +35,8 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
 
     if (fl==CONNECT_FL)
     {
+
+        /******* Validations before connect *********/
         client_list *countList = *theList;
         int connectCount=0;
         while(countList!=NULL){
@@ -46,6 +48,7 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
             }
             countList=countList->cl_next;
         }
+
     }
 
     /******* Validate port *********/
@@ -64,7 +67,7 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
 
     memset (&hints, 0,sizeof hints);
 
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 
     if ((status = getaddrinfo(destination, portStr, &hints, &res)) != 0)
@@ -86,6 +89,20 @@ void command_connect(char * destination, char *portStr, client_list **theList, c
     }
 
     /******* Get sockaddr of destination - End *********/
+
+    /******* Self connection validation *********/
+    if (fl==CONNECT_FL)
+    {
+        commandMyip();
+        if (strcmp(my_ip_addr,ipstr)==0 && strcmp(portStr,listening_port)==0)
+        {
+            fprintf(stderr, "Connecting to self\n");
+            return;
+        }
+                
+
+    }
+
 
     /******* Connect to server *********/
     int connect_socket = socket( AF_INET,

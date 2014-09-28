@@ -16,4 +16,8 @@ int pop(client_list **theList,int file_desc);
 void add_port_to_client(client_list *theList, int file_desc ,char *port_num);
 bool get_list_entry(client_list *theList, client_list **theEntry,int file_desc);
 void change_connect_id(client_list **theList, int file_desc ,int cid);
+void change_port_null(client_list **theList, int file_desc);
+void setTransferRates(client_list **theList, int file_desc, 
+    int upload_count,double sum_txrate, int download_count, double sum_dwrate);
+
 #endif

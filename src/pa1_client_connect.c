@@ -55,7 +55,7 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
 
     if (isServerFlag)
     {
-    	send_all(file_desc,"39 error Connect to server not allowed ",39);
+    	send_all(file_desc,"41 error-c Connect to server not allowed ",41);
     	client_list *current;
     	get_list_entry(theList,&current,file_desc);
     	fprintf(stderr, "%s (%s) tried connect. Connection declined.\n",
@@ -82,10 +82,10 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
     {
     	if (sip_list==NULL)
     	{
-    		send_all(file_desc,"48 error Destination not registered with server ",48);
+    		send_all(file_desc,"50 error-c Destination not registered with server ",50);
     		fprintf(stderr, "Self not registered. Connection declined.\n");
     	}else{
-    		send_all(file_desc,"36 error Not registered with server ",36);
+    		send_all(file_desc,"38 error-c Not registered with server ",38);
     		client_list *current;
     		get_list_entry(theList,&current,file_desc);
     		fprintf(stderr, "%s (%s) not registered. Connection declined.\n",
@@ -113,7 +113,7 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
     }
     if (alreadyExistFlag)
     {
-    	send_all(file_desc,"27 error Already connected ",27);
+    	send_all(file_desc,"29 error-c Already connected ",29);
     	client_list *current;
     	get_list_entry(theList,&current,file_desc);
     	fprintf(stderr, "%s (%s) already connected. Duplicate connection declined.\n",
@@ -135,6 +135,7 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
     {
     	client_list *current;
     	get_list_entry(theList,&current,file_desc);
+    	send_all(file_desc,"11 error-c ",11);
     	fprintf(stderr, "%s %s is self. Self connection declined.\n",
     		current->host_name,current->ip_addr);
     	return false;
@@ -155,7 +156,7 @@ bool validate_connect(client_list *theList, int file_desc, char *port){
     }
     if (moreThanThree)
     {
-    	send_all(file_desc,"50 error Destination already connected to 3 peers ",50);
+    	send_all(file_desc,"52 error-c Destination already connected to 3 peers ",52);
     	client_list *current;
     	get_list_entry(theList,&current,file_desc);
     	fprintf(stderr, "%s (%s) Maximum connections reached. New connection declined.\n",

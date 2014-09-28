@@ -30,6 +30,7 @@ char * listening_port;
 
 fd_set master; //master file desc set
 int fd_max; //tracking maximum fd_set
+client_list *removed_list;
 
 /******* Function declarations *********/
 char * create_list_string(client_list *theList);
@@ -350,7 +351,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             {
                                 sendStatistics(theList,ii);
                             }else{
-                                static int printFlag = 0;
+                                /******* Get client count *********/
                                 int connectCount = 0;
                                 client_list *loopList=theList;
                                 while(loopList!=NULL){
@@ -358,12 +359,16 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                                     loopList=loopList->cl_next;
                                 }
 
+                                /******* Print header only once *********/
+                                static int printFlag = 0;
                                 if (printFlag==0)
                                 {
                                     printHeader();
                                 }
                                 printStatistics(theList, recv_buf+13, ii);
                                 printFlag++;
+
+                                /******* Reset printFlag if all clients finished printing *********/
                                 if (printFlag==connectCount)
                                 {
                                     printFlag = 0;
@@ -372,13 +377,23 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             }
 
 
-                        }else if(strcmp(argv[1],"error")==0){
-                            size_t length = (size_t)(strlen(recv_buf)-9);
-                            char *errorString= strndup(recv_buf+9,length);
+                        }else if(strcmp(argv[1],"error")==0||strcmp(argv[1],"error-c")==0){
+
+                            int offset = 9;
+                            if (strcmp(argv[1],"error-c")==0)
+                            {
+                                offset = 11;
+                                change_port_null(&theList, ii);
+                            }
+
+                            size_t length = (size_t)(strlen(recv_buf)-offset);
+                            char *errorString= strndup(recv_buf+offset,length);
                             printf ("\nError: %s\n", errorString);
                             free(errorString);
-                            printf(PROMPT_NAME);
-                            // fflush(stdout);
+                            if (strcmp(argv[1],"error")==0)
+                            {
+                                printf(PROMPT_NAME);
+                            }
                         }else{
                             fprintf(stderr, "%s Invalid data\n",argv[1]);
                             printf(PROMPT_NAME);
