@@ -134,26 +134,3 @@ void command_upload(client_list *theList, int connection_id, char *path, TRANSFE
 	}
 }
 
-
-/******* Writing to file in one shot. Doesn't affect the network speed *********/
-bool writeToFile(char *data,char *fileName,int writeLength)
-{
-	FILE *fp;
-	if (fp = fopen(fileName, "wb"))
-	{
-		int nbytes = fwrite(data,1,writeLength,fp);
-		if (nbytes<0)
-		{
-			perror("write");
-			fclose(fp);
-			return false;
-		}
-	}else{
-		perror("fopen");
-		return false;
-	}
-	fclose(fp);
-	return true;
-
-
-}

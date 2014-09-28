@@ -213,7 +213,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                     int nbytes;
                     struct timeval tv_start;
                     gettimeofday(&tv_start,NULL);
-                    if ((nbytes = recv(ii, recv_buf, sizeof recv_buf, 0)) <= 0)
+                    if ((nbytes = recv(ii, recv_buf, 256, 0)) <= 0)
                     {
                         // got error or connection closed by client
                         if (nbytes < 0)
@@ -236,12 +236,98 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                     else
                     {
 
+
+
                         /******* Make sure all input is received *********/
                         char *arg; //var for storing tokenized input
                         char *recv_bufCopy; // needed since strtok modifies string
+                        
+
+                        /******* Receive first 50 or less charachters *********/
+                        if (nbytes<50)
+                        {
+                            
+                            recv_bufCopy = strdup(recv_buf);
+                            arg = strtok(recv_bufCopy," ");
+                            int receiveLength = 50;
+                            int com_len = strtol(arg,NULL,10);
+                            if (com_len<50)
+                            {
+                                receiveLength = com_len;
+                            }else{
+
+                            }
+                            recv_buf = (char *)realloc(recv_buf,receiveLength+1);
+                            if (receiveLength-nbytes>0)
+                            {
+                                recv_all(ii,recv_buf,receiveLength-nbytes,nbytes);
+                            }
+                            nbytes = receiveLength; //nbytes  = total received bytes
+                            free(recv_bufCopy);
+                        }
+
+
                         recv_bufCopy = strdup(recv_buf);
+                        int f_count = 0;
+                        char **f_array = (char **)calloc(50, sizeof(char *));
+                        char *endString1;
                         arg = strtok(recv_bufCopy," ");
-                        int commandLen = strtol(arg,NULL,10);
+                        while(arg){
+                            f_array[f_count] = strdup(arg);
+                            arg = strtok(NULL," ");
+                            f_count++;
+                        }
+                        free(recv_bufCopy);
+                        /******* Handle special case of file write *********/
+                        int commandLen = strtol(f_array[0],NULL,10);
+
+                        if (strcmp(f_array[1],"file")==0)
+                        {
+                            
+                            int bufLength =strtol(f_array[0],NULL,10);
+                            int digitsLen = noOfDigits(bufLength);//Get no of digits of length
+                            /******* DigitsLen+space+'file'+space+'fileName'+space *********/
+                            int offset = digitsLen+1+4+1+strlen(f_array[2])+1;
+                            bool write_status = recv_n_write(ii, recv_buf+offset,commandLen,nbytes,f_array[2]);
+                            if (write_status)
+                            {
+                                struct timeval tv_end;
+                                gettimeofday(&tv_end,NULL);
+
+                                /******* Get receive rate *********/
+                                long diff_usec = (tv_end.tv_sec*(long)1000000.0+tv_end.tv_usec) -
+                                (tv_start.tv_sec*(long)1000000.0+tv_start.tv_usec);
+                                int noOfBits = (commandLen-offset)*8;
+                                double rxRate = (((float)noOfBits)/diff_usec)*1000000.0;
+
+                                /******* Get my and destination host name *********/
+                                char my_host_name[50];
+                                gethostname(my_host_name,50);
+                                client_list *host;
+                                get_list_entry(theList, &host, ii);
+                                printf("\nRx: %s -> %s, File size: %d Bytes, Time Taken: %f seconds, Rx Rate: %.2f bits/second\n",
+                                    host->host_name,my_host_name,noOfBits/8,diff_usec/1000000.0, rxRate );
+
+                                host->download_count++;
+                                host->sum_dwrate += rxRate;
+
+                            }    
+
+                            printf(PROMPT_NAME);
+
+
+                            free(recv_buf);
+                            int loopF;
+                            for (loopF = 0; loopF < f_count; ++loopF)
+                            {
+                                free(f_array[loopF]);
+                            }
+                            free(f_array);
+                            continue;
+                        }
+
+
+                        /******* Receive rest of input *********/
                         recv_buf = (char *)realloc(recv_buf,commandLen+1);
                         if (commandLen-nbytes>0)
                         {
@@ -271,13 +357,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                         free(recv_bufCopy);
 
 
-
-                        /******* Handle the register command from client *********/
-                        // if (argc==0)
-                        // {
-                        //     continue;
-                        // }
-                        // printf("Received %s\n", recv_buf);
+                        // printf("%s\n",recv_buf);
                         if (strcmp(argv[1],"register")==0)
                         {
                             if (runningMode==kCLIENT_MODE)
@@ -309,36 +389,7 @@ int listen_at_port(RUNNING_MODE runningMode, char * port)
                             // fflush(stdout);
 
                         }else if(strcmp(argv[1],"file")==0){
-                            int bufLength =strtol(argv[0],NULL,10);
-                            int digitsLen = noOfDigits(bufLength);//Get no of digits of length
-                            /******* DigitsLen+space+'file'+space+'fileName'+space *********/
-                            int offset = digitsLen+1+4+1+strlen(argv[2])+1;
-                            int writeLength = bufLength - offset;
-                            bool write_status = writeToFile(recv_buf+offset,argv[2],writeLength);
-                            if (write_status)
-                            {
-                                struct timeval tv_end;
-                                gettimeofday(&tv_end,NULL);
-
-                                /******* Get receive rate *********/
-                                long diff_usec = (tv_end.tv_sec*(long)1000000.0+tv_end.tv_usec) -
-                                (tv_start.tv_sec*(long)1000000.0+tv_start.tv_usec);
-                                int noOfBits = (writeLength)*8;
-                                double rxRate = (((float)noOfBits)/diff_usec)*1000000.0;
-
-                                /******* Get my and destination host name *********/
-                                char my_host_name[50];
-                                gethostname(my_host_name,50);
-                                client_list *host;
-                                get_list_entry(theList, &host, ii);
-                                printf("Rx: %s -> %s, File size: %d Bytes, Time Taken: %f seconds, Rx Rate: %.2f bits/second\n",
-                                    host->host_name,my_host_name,writeLength,diff_usec/1000000.0, rxRate );
-
-                                host->download_count++;
-                                host->sum_dwrate += rxRate;
-
-                            }                        
-                            printf(PROMPT_NAME);
+                            
 
                         }else if(strcmp(argv[1],"download")==0){
                             client_list *downloadEntry;

@@ -53,7 +53,7 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 				avg_rxrate = loopList->sum_dwrate/loopList->download_count;
 
 			} 
-			printf("%-28s%-14d%-11.2f%-16d%-11.2f\n",
+			printf("%-28s%-14d%-11.0f%-16d%-11.0f\n",
 				loopList->host_name,
 				loopList->upload_count,
 				avg_txrate,
@@ -78,7 +78,7 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 				avg_rxrate = loopList->sum_dwrate/loopList->download_count;
 
 			} 
-			printf("%-28s%-14d%-11.2f%-16d%-11.2f\n",
+			printf("%-28s%-14d%-11.0f%-16d%-11.0f\n",
 				loopList->host_name,
 				loopList->upload_count,
 				avg_txrate,
@@ -90,7 +90,7 @@ void command_statistics(client_list *theList, RUNNING_MODE runningMode){
 		}
 		if (client_count<2)
 		{
-			printf("%-28s%-14s%-11s%-16s%-11.2s\n","-","-","-","-","-");
+			printf("%-28s%-14s%-11s%-16s%-11.0s\n","-","-","-","-","-");
 		}
 
 	}else{
@@ -139,7 +139,7 @@ void sendStatistics(client_list *theList, int file_desc){
     		avg_rxrate = loopList->sum_dwrate/loopList->download_count;
 
     	} 
-        sprintf(ntw_string,"%s%s,%d,%.2f,%d,%.2f;",
+        sprintf(ntw_string,"%s%s,%d,%.0f,%d,%.0f;",
             ntw_string,
             loopList->host_name,
             loopList->upload_count,
@@ -162,7 +162,7 @@ void sendStatistics(client_list *theList, int file_desc){
     	{
     		avg_rxrate = loopList->sum_dwrate/loopList->download_count;
     	} 
-        sprintf(ntw_string,"%s%s,%d,%.2f,%d,%.2f;",
+        sprintf(ntw_string,"%s%s,%d,%.0f,%d,%.0f;",
             ntw_string,
             loopList->host_name,
             loopList->upload_count,

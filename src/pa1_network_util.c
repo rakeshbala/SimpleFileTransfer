@@ -80,6 +80,61 @@ bool recv_all(int socket_fd, char *buffer,int buffer_len, int nbytes){
 	return true;
 }
 
+
+
+bool recv_n_write(int socket_fd, char *buffer,int buffer_len, int nbytes, char *fileName){
+
+
+	FILE *fp;
+	if (fp = fopen(fileName, "ab")){
+
+		int w_size = fwrite(buffer,1,strlen(buffer),fp);
+		if (w_size<0)
+		{
+			perror("write");
+			fclose(fp);
+			return false;
+		}
+		
+		int tempLen= buffer_len-nbytes;
+		while(tempLen>0){
+			char *temp = (char *)calloc(1000+1,sizeof(char));//allocate buffer
+			if (!temp)
+			{
+				perror("calloc");
+				return false;
+			}
+			int bytesRecv = recv(socket_fd,temp,1000,0);//receive
+			if (bytesRecv<0)
+			{
+				perror("recv");
+				free(temp);
+				return false;
+			}
+			w_size = fwrite(temp,1,bytesRecv,fp);//write
+			if (w_size<0)
+			{
+				perror("write");
+				fclose(fp);
+				return false;
+			}
+			tempLen -= bytesRecv; //update length
+			free(temp);
+		}
+	}else{
+		perror("fopen");
+		return false;
+	}
+	fclose(fp);
+	return true;
+}
+
+
+// double calculateTransferRate(timeval start, timeval end, long bits){
+	
+// }
+
+
 int noOfDigits(int num){
     int digits = 0;
     while(num>0){
