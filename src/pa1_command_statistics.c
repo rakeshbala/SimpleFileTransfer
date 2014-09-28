@@ -204,6 +204,7 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
 {
 	char *container;
     char *strTokInt;
+    printf("Stat :%s\n", stat_string);
     container = strtok_r(stat_string,";",&strTokInt);
     int dummyFd=2;
 
@@ -218,7 +219,6 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
         container2 = strtok_r(container,",",&strTokInt2);
         while (container2)
         {
-            // tokenArray[argc] = calloc(strlen(container2)+1, sizeof(char));
             tokenArray[argc] = strdup(container2);
             argc++;
             container2 = strtok_r(NULL,",",&strTokInt2);
@@ -248,7 +248,7 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
 
 void printHeader(){
 
-	printf("\n---------------------------------------- Statistics -------------------------------------------------\n");
+	printf("\n------------------------------------------ Statistics -------------------------------------------------\n");
 	printf("%-32s%-32s%-8s%-14s%-10s%-11s\n","Hostname 1","Hostname 2",
 		"Uploads",
 		"Average ",
@@ -256,6 +256,6 @@ void printHeader(){
 		"Average ");
 	printf("%-32s%-32s%-8s%-14s%-10s%-11s\n"," "," "," ","upload"," ","download");
 	printf("%-32s%-32s%-8s%-14s%-10s%-11s\n"," "," "," ","speed(bps)"," ","speed(bps)");
-	printf("-----------------------------------------------------------------------------------------------------\n");
+	printf("-------------------------------------------------------------------------------------------------------\n");
 
 }
