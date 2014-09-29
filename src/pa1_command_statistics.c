@@ -225,7 +225,6 @@ void printStatistics(client_list *theList, char *stat_string, int file_desc)
 {
 	char *container;
     char *strTokInt;
-    printf("Stat :%s\n", stat_string);
     container = strtok_r(stat_string,";",&strTokInt);
     int dummyFd=2;
 
