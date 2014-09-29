@@ -39,6 +39,7 @@ Description  : Command for 'CONNECT' and 'REGISTER'
 @arg         : theList address to list pointer
 @arg         : fl flag to indicate connect/register
 @return      : void
+Ref: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#getaddrinfo
 *****************************************************************/
 void command_connect(char * destination, char *portStr, client_list **theList, connect_flag fl)
 {
