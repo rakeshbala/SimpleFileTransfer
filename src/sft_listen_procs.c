@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_listen_procs.c
+File name   : sft_listen_procs.c
 Description : Main select multiplexing loop and dispatching
 @author     : rab
 @created    : 13th Sep 2014
@@ -8,13 +8,13 @@ Description : Main select multiplexing loop and dispatching
 #define _GNU_SOURCE 1
 
 #include "global.h"
-#include "pa1_listen_procs.h"
-#include "pa1_ui.h"
-#include "pa1_cmd_validate.h"
-#include "pa1_network_util.h"
-#include "pa1_client_register.h"
-#include "pa1_client_connect.h"
-#include "pa1_command_upload.h"
+#include "sft_listen_procs.h"
+#include "sft_ui.h"
+#include "sft_cmd_validate.h"
+#include "sft_network_util.h"
+#include "sft_client_register.h"
+#include "sft_client_connect.h"
+#include "sft_command_upload.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>

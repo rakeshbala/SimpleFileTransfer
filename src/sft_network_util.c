@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_network_util.c
+File name   : sft_network_util.c
 Description : Generic network utility functions
 @author     : Rakesh Balasubramanian
 @created    : 14 Sep 2014

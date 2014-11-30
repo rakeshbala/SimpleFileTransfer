@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_cmd_validate.c
+File name   : sft_cmd_validate.c
 Description : functions related to command line argument 
               validation
 @author     : Rakesh Balasubramanian
@@ -8,7 +8,7 @@ Description : functions related to command line argument
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "pa1_cmd_validate.h"
+#include "sft_cmd_validate.h"
 #include "global.h"
 #include <string.h>
 
@@ -21,7 +21,7 @@ CMD_Validation_Status cmd_arg_validate (int argc, char **argv)
     printf("Checking arguments...\n");
     if (argc != 3)
     {
-        fprintf(stderr, ANSI_COLOR_RED "usage: rbalasub_assignment1 \
+        fprintf(stderr, ANSI_COLOR_RED "usage: sft \
 [s c] <port>" ANSI_COLOR_RESET "\n");
         return kNotEnoughArguments;
     }

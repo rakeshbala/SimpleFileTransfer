@@ -1,5 +1,5 @@
 /**
- * @rbalasub_assignment1
+ * @sft_main.c
  * @author  Rakesh Balasubramanian <rbalasub@buffalo.edu>
  * @version 1.0
  *
@@ -25,8 +25,8 @@
 #include <string.h>
 
 #include "../include/global.h"
-#include "pa1_ui.h"
-#include "pa1_cmd_validate.h"
+#include "sft_ui.h"
+#include "sft_cmd_validate.h"
 
 
 /**

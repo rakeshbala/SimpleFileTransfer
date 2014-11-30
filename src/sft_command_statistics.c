@@ -1,12 +1,12 @@
 /**********************************************************
-File name   : pa1_command_statistics.c
+File name   : sft_command_statistics.c
 Description : functions related to thed command 'STATISTICS'
 @author     : Rakesh Balasubramanian
 @created    : 26 Sep 2014
 **********************************************************/
 
 #include "global.h"
-#include "pa1_command_statistics.h"
+#include "sft_command_statistics.h"
 
 
 #include <stdio.h>

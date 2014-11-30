@@ -1,12 +1,12 @@
 /**********************************************************
-File name   : pa1_client_connect.c
+File name   : sft_client_connect.c
 Description : Validation of connect after calling connect
 @author     : Rakesh Balasubramanian
 @created    : 21st Sep 2014
 **********************************************************/
 #include "global.h"
-#include "pa1_client_connect.h"
-#include "pa1_command_handler.h"
+#include "sft_client_connect.h"
+#include "sft_command_handler.h"
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -10,13 +10,13 @@ LIBS	=
 CC		= gcc
 CFLAGS	= -I$(INC_DIR)
 
-all: assignment1
+all: sft
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
-assignment1: $(OBJ_PATH)
+sft: $(OBJ_PATH)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 clean:
-	rm -f $(OBJ_DIR)/*.o $(INC_DIR)/*~ assignment1
+	rm -f $(OBJ_DIR)/*.o $(INC_DIR)/*~ sft

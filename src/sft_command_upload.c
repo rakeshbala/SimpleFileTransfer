@@ -1,12 +1,12 @@
 /**********************************************************
-File name   : pa1_command_upload.c
+File name   : sft_command_upload.c
 Description : functions related to command 'UPLOAD'
 @author     : Rakesh Balasubramanian
 @created    : 24 Sep 2014
 **********************************************************/
 #include "global.h"
-#include "pa1_command_upload.h"
-#include "pa1_network_util.h"
+#include "sft_command_upload.h"
+#include "sft_network_util.h"
 
 #include <unistd.h>
 #include <stdio.h>

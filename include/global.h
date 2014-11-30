@@ -29,7 +29,7 @@ and-colored-output-in-c
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-#define PROMPT_NAME "[PA1]$ "
+#define PROMPT_NAME "[SFT]$ "
 
 typedef enum
 {

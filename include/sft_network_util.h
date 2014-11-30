@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_network_util.h
+File name   : sft_network_util.h
 Description : Generic network utility functions
 @author     : Rakesh Balasubramanian
 @created    : 14 Sep 2014
@@ -8,8 +8,8 @@ Description : Generic network utility functions
 #include <sys/socket.h>
 #include "global.h"
 
-#ifndef PA1_NETWORK_UTIL_H_
-#define PA1_NETWORK_UTIL_H_ 
+#ifndef SFT_NETWORK_UTIL_H_
+#define SFT_NETWORK_UTIL_H_ 
 
 void *get_in_addr(struct sockaddr *sa);
 bool send_all(int socket_fd, char *buffer, int buffer_len);

@@ -1,15 +1,15 @@
 /**********************************************************
-File name   : pa1_ui.c
+File name   : sft_ui.c
 Description : STDIN input and handling
 @author     : Rakesh Balasubramanian
 @created    : 8 Sep 2014
 **********************************************************/
 
 /******* Include user header files *********/
-#include "pa1_ui.h"
+#include "sft_ui.h"
 #include "global.h"
-#include "pa1_command_handler.h"
-#include "pa1_listen_procs.h"
+#include "sft_command_handler.h"
+#include "sft_listen_procs.h"
 
 /******* Include library files *********/
 #include <stdio.h>

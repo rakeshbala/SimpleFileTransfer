@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_command_misc.c
+File name   : sft_command_misc.c
 Description : Functions related to "LIST", "TERMINATE" and
 			  "EXIT"
 @author     : Rakesh Balasubramanian
@@ -7,7 +7,7 @@ Description : Functions related to "LIST", "TERMINATE" and
 **********************************************************/
 
 #include "global.h"
-#include "pa1_command_misc.h"
+#include "sft_command_misc.h"
 #include <stdlib.h>
 #include <stdio.h>
 

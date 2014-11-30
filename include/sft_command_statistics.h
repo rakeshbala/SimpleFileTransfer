@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_command_statistics.h
+File name   : sft_command_statistics.h
 Description : functions related to thed command 'STATISTICS'
 @author     : Rakesh Balasubramanian
 @created    : 26 Sep 2014
@@ -8,8 +8,8 @@ Description : functions related to thed command 'STATISTICS'
 
 #include "global.h"
 
-#ifndef PA1_COMMAND_STATISTICS_H_
-#define PA1_COMMAND_STATISTICS_H_ 
+#ifndef SFT_COMMAND_STATISTICS_H_
+#define SFT_COMMAND_STATISTICS_H_ 
 
 void command_statistics(client_list *theList,RUNNING_MODE runningMode);
 void printHeader();

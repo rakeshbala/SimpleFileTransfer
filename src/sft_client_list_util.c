@@ -1,18 +1,18 @@
 /**********************************************************
-File name   : pa1_client_list_util.c
+File name   : sft_client_list_util.c
 Description : Methods to modify the core linked list of type
               client_list
 @author     : Rakesh Balasubramanian
 @created    : 19th Sep 2014
 **********************************************************/
 
-#include "pa1_client_list_util.h"
+#include "sft_client_list_util.h"
 
 #include "global.h"
-#include "pa1_listen_procs.h"
-#include "pa1_ui.h"
-#include "pa1_cmd_validate.h"
-#include "pa1_network_util.h"
+#include "sft_listen_procs.h"
+#include "sft_ui.h"
+#include "sft_cmd_validate.h"
+#include "sft_network_util.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>

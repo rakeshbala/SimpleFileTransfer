@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_client_list_util.h
+File name   : sft_client_list_util.h
 Description : Methods to modify the core linked list of type
 			  client_list
 @author     : Rakesh Balasubramanian
@@ -8,8 +8,8 @@ Description : Methods to modify the core linked list of type
 
 #include "global.h"
 
-#ifndef PA1_CLIENT_LIST_UTIL_H_
-#define PA1_CLIENT_LIST_UTIL_H_ 
+#ifndef SFT_CLIENT_LIST_UTIL_H_
+#define SFT_CLIENT_LIST_UTIL_H_ 
 
 void add_to_client_list(client_list ** theList,int file_desc,char *host_name, char *ip_addr);
 int remove_from_client_list(client_list **theList, int file_desc);

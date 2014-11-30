@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_command_handler.c
+File name   : sft_command_handler.c
 Description : function for handling and dispatching typed in 
               commands
 @author     : Rakesh Balasubramanian
@@ -7,9 +7,9 @@ Description : function for handling and dispatching typed in
 **********************************************************/
 
 #include "global.h"
-#include "pa1_command_handler.h"
-#include "pa1_client_register.h"
-#include "pa1_command_handler.h"
+#include "sft_command_handler.h"
+#include "sft_client_register.h"
+#include "sft_command_handler.h"
 
 #include <stdio.h>
 #include <stdlib.h>

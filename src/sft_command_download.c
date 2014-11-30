@@ -1,11 +1,11 @@
 /**********************************************************
-File name   : pa1_command_download.c
+File name   : sft_command_download.c
 Description : functions related ot command "DOWNLOAD"
 @author     : Rakesh Balasubramanian
 @created    : 26 Sep 2014
 **********************************************************/
 #include "global.h"
-#include "pa1_command_download.h"
+#include "sft_command_download.h"
 
 #include <stdio.h>
 #include <stdlib.h>

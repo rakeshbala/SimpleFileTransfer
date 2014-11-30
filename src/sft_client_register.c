@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_client_register.c
+File name   : sft_client_register.c
 Description : functions  and enums involving REGISTER command
 @author     : Rakesh Balasubramanian
 @created    : 14th Sep 2014
@@ -7,10 +7,10 @@ Description : functions  and enums involving REGISTER command
 
 
 #include "global.h"
-#include "pa1_client_register.h"
-#include "pa1_network_util.h"
-#include "pa1_cmd_validate.h"
-#include "pa1_ui.h"
+#include "sft_client_register.h"
+#include "sft_network_util.h"
+#include "sft_cmd_validate.h"
+#include "sft_ui.h"
 
 
 #include <stdio.h>

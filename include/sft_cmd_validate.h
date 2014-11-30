@@ -1,5 +1,5 @@
 /**********************************************************
-File name   : pa1_cmd_validate.h
+File name   : sft_cmd_validate.h
 Description : functions related to command line argument 
 			  validation
 @author     : Rakesh Balasubramanian
@@ -10,8 +10,8 @@ Description : functions related to command line argument
 #include "global.h"
 
 
-#ifndef PA1_CMD_VALIDATE_H_
-#define PA1_CMD_VALIDATE_H_
+#ifndef SFT_CMD_VALIDATE_H_
+#define SFT_CMD_VALIDATE_H_
 
 CMD_Validation_Status cmd_arg_validate (int argc, char **argv);
 CMD_Validation_Status checkPort (char * port);
